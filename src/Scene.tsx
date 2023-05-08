@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import React from 'react';
 import { MathUtils } from 'three';
 
-import { Box } from './components';
+import { Board } from './components';
 
 export const Scene: React.FC = () => {
     return (
@@ -12,12 +12,12 @@ export const Scene: React.FC = () => {
 
             <pointLight position={[10, 10, 10]} />
 
-            <Box
-                color='red'
-                height={10}
-                length={10}
-                width={10}
-                position={{ x: 0, y: 0, z: 0 }}
+            <Board
+                borderColor='grey'
+                borderWidth={2}
+                cellSize={5}
+                position={{ x: 0, y: -0.5, z: 0 }}
+                thickness={1}
             />
 
             <CameraControls
