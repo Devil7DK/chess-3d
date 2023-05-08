@@ -1,6 +1,8 @@
 import { CameraControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import React from 'react';
+import { MathUtils } from 'three';
+
 import { Box } from './components';
 
 export const Scene: React.FC = () => {
@@ -18,7 +20,11 @@ export const Scene: React.FC = () => {
                 position={{ x: 0, y: 0, z: 0 }}
             />
 
-            <CameraControls distance={20} azimuthAngle={10} polarAngle={1} />
+            <CameraControls
+                distance={50}
+                azimuthAngle={1}
+                polarAngle={MathUtils.degToRad(40)}
+            />
         </Canvas>
     );
 };
