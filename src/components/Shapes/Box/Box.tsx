@@ -6,6 +6,7 @@ import {
     Material,
     Mesh,
     NormalBufferAttributes,
+    Texture,
 } from 'three';
 
 import { Box as BoxType } from '../../../types';
@@ -21,6 +22,14 @@ export interface IBoxProps extends BoxType {
               ColorRepresentation,
               ColorRepresentation
           ];
+    textures?: [
+        Texture | null,
+        Texture | null,
+        Texture | null,
+        Texture | null,
+        Texture | null,
+        Texture | null
+    ];
 }
 
 export const Box: React.FC<IBoxProps> = ({
@@ -29,6 +38,7 @@ export const Box: React.FC<IBoxProps> = ({
     length,
     position,
     width,
+    textures,
 }) => {
     const ref =
         useRef<
@@ -44,14 +54,26 @@ export const Box: React.FC<IBoxProps> = ({
     return (
         <mesh ref={ref}>
             <boxGeometry args={[width, height, length]} attach='geometry' />
-            {Array.isArray(color) ? (
-                color.map((color, index) => (
-                    <meshBasicMaterial
-                        key={`face-${index}`}
-                        color={color}
-                        attach={`material-${index}`}
-                    />
-                ))
+            {Array.isArray(color) || Array.isArray(textures) ? (
+                new Array(6).fill('').map((_, index) => {
+                    return (
+                        <meshBasicMaterial
+                            key={`face-${index}`}
+                            color={
+                                Array.isArray(color)
+                                    ? !Array.isArray(textures) ||
+                                      !textures[index]
+                                        ? color[index]
+                                        : undefined
+                                    : color
+                            }
+                            map={
+                                Array.isArray(textures) ? textures[index] : null
+                            }
+                            attach={`material-${index}`}
+                        />
+                    );
+                })
             ) : (
                 <meshBasicMaterial color={color} />
             )}
