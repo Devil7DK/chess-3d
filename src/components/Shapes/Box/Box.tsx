@@ -11,7 +11,16 @@ import {
 import { Box as BoxType } from '../../../types';
 
 export interface IBoxProps extends BoxType {
-    color: ColorRepresentation;
+    color:
+        | ColorRepresentation
+        | [
+              ColorRepresentation,
+              ColorRepresentation,
+              ColorRepresentation,
+              ColorRepresentation,
+              ColorRepresentation,
+              ColorRepresentation
+          ];
 }
 
 export const Box: React.FC<IBoxProps> = ({
@@ -34,8 +43,18 @@ export const Box: React.FC<IBoxProps> = ({
 
     return (
         <mesh ref={ref}>
-            <boxGeometry args={[width, height, length]} />
-            <meshBasicMaterial color={color} />
+            <boxGeometry args={[width, height, length]} attach='geometry' />
+            {Array.isArray(color) ? (
+                color.map((color, index) => (
+                    <meshBasicMaterial
+                        key={`face-${index}`}
+                        color={color}
+                        attach={`material-${index}`}
+                    />
+                ))
+            ) : (
+                <meshBasicMaterial color={color} />
+            )}
         </mesh>
     );
 };
