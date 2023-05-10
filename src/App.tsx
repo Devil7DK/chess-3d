@@ -3,13 +3,14 @@ import './App.scss';
 import React from 'react';
 
 import { Scene } from './Scene';
+import { ChessStateProvider } from './utils/ChessState';
 
 export const App: React.FC = () => {
     return (
         <>
-            <React.Suspense fallback={null}>
+            <ChessStateProvider>
                 <Scene />
-            </React.Suspense>
+            </ChessStateProvider>
         </>
     );
 };

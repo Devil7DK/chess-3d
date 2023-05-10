@@ -11,15 +11,12 @@ import Queen from '../../assets/models/Queen.gltf';
 import Rook from '../../assets/models/Rook.gltf';
 import WoodBlack from '../../assets/textures/wood-black.jpg';
 import WoodWhite from '../../assets/textures/wood-white.jpg';
-import { Point3D } from '../../types';
-import { get2DPointInGrid } from '../../utils';
+import { ChessPiece, Point3D, Side } from '../../types';
 
 export type IPieceProps = JSX.IntrinsicElements['group'] & {
-    piece: 'king' | 'queen' | 'bishop' | 'knight' | 'rook' | 'pawn';
-    cellIndex: number;
-    cellSize: number;
-    boardPosition: Point3D;
-    color: 'white' | 'black';
+    piece: ChessPiece;
+    side: Side;
+    cellPosition: Point3D;
 };
 
 type GLTFResult = GLTF & {
@@ -33,10 +30,8 @@ type GLTFResult = GLTF & {
 
 export const Piece: React.FC<IPieceProps> = ({
     piece,
-    boardPosition,
-    cellIndex,
-    cellSize,
-    color,
+    side,
+    cellPosition,
     ...props
 }) => {
     const gltf = useGLTF(
@@ -53,7 +48,7 @@ export const Piece: React.FC<IPieceProps> = ({
             : Rook
     ) as GLTFResult;
 
-    const texture = useTexture(color === 'black' ? WoodBlack : WoodWhite);
+    const texture = useTexture(side === 'black' ? WoodBlack : WoodWhite);
 
     const { geometry, material } = useMemo(() => {
         return {
@@ -63,10 +58,8 @@ export const Piece: React.FC<IPieceProps> = ({
     }, [gltf]);
 
     const position = useMemo(() => {
-        const { x, y } = get2DPointInGrid(cellSize, boardPosition, cellIndex);
-
-        return new Vector3(x, boardPosition.y, y);
-    }, [cellIndex]);
+        return new Vector3(cellPosition.x, cellPosition.y, cellPosition.z);
+    }, [cellPosition]);
 
     return (
         <group
@@ -83,7 +76,7 @@ export const Piece: React.FC<IPieceProps> = ({
                     MathUtils.degToRad(270),
                     0,
                     piece === 'knight'
-                        ? color === 'white'
+                        ? side === 'white'
                             ? MathUtils.degToRad(90)
                             : MathUtils.degToRad(270)
                         : 0,

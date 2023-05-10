@@ -2,7 +2,9 @@ import React, { useMemo } from 'react';
 import { CanvasTexture, ColorRepresentation } from 'three';
 
 import { Point3D } from '../../types';
-import { get2DPointInGrid, getRowColumnFromIndex } from '../../utils';
+import { get2DPointInGrid } from '../../utils';
+import { useChessState } from '../../utils/ChessState';
+import { Piece } from '../Piece';
 import { Box, IBoxProps } from '../Shapes';
 
 export interface IBoardProps {
@@ -20,19 +22,12 @@ export const Board: React.FC<IBoardProps> = ({
     position,
     thickness,
 }) => {
-    const boxes = useMemo<IBoxProps[]>(() => {
-        const cells = new Array(64).fill('').map<IBoxProps>((_, index) => {
-            const { row, column } = getRowColumnFromIndex(index);
-            const { x, y } = get2DPointInGrid(5, position, row, column);
+    const { cells } = useChessState();
 
-            const color =
-                row % 2
-                    ? column % 2
-                        ? 'white'
-                        : 'black'
-                    : column % 2
-                    ? 'black'
-                    : 'white';
+    const boxes = useMemo<IBoxProps[]>(() => {
+        const boxes = cells.map<IBoxProps>((cell, index) => {
+            const { row, column, color } = cell;
+            const { x, y } = get2DPointInGrid(cellSize, position, row, column);
 
             const textCanvas = document.createElement('canvas');
             textCanvas.width = 100;
@@ -65,10 +60,14 @@ export const Board: React.FC<IBoardProps> = ({
             };
         });
 
+        return boxes;
+    }, [cells]);
+
+    const borders = useMemo(() => {
         const border: IBoxProps[] = [];
 
         for (let i = 0; i < 8; i++) {
-            const cell = cells[i];
+            const cell = boxes[i];
 
             const x = cell.position.x;
             const y = cell.position.y;
@@ -113,7 +112,7 @@ export const Board: React.FC<IBoardProps> = ({
 
             border.push(point1);
 
-            const cell2 = cells[56 + i];
+            const cell2 = boxes[56 + i];
             border.push({
                 ...point1,
                 position: {
@@ -124,7 +123,7 @@ export const Board: React.FC<IBoardProps> = ({
         }
 
         for (let i = 0; i < 8; i++) {
-            const cell = cells[i * 8];
+            const cell = boxes[i * 8];
 
             const x = cell.position.x - cellSize / 2 - borderWidth / 2;
             const y = cell.position.y;
@@ -169,7 +168,7 @@ export const Board: React.FC<IBoardProps> = ({
 
             border.push(point1);
 
-            const cell2 = cells[(i + 1) * 8 - 1];
+            const cell2 = boxes[(i + 1) * 8 - 1];
             border.push({
                 ...point1,
                 position: {
@@ -179,10 +178,10 @@ export const Board: React.FC<IBoardProps> = ({
             });
         }
 
-        const topLeftCell = cells[0];
-        const topRightCell = cells[7];
-        const bottomLeftCell = cells[56];
-        const bottomRightCell = cells[63];
+        const topLeftCell = boxes[0];
+        const topRightCell = boxes[7];
+        const bottomLeftCell = boxes[56];
+        const bottomRightCell = boxes[63];
 
         const corner: IBoxProps = {
             color: borderColor,
@@ -222,12 +221,28 @@ export const Board: React.FC<IBoardProps> = ({
             },
         });
 
-        return [...cells, ...border];
-    }, []);
+        return border;
+    }, [boxes]);
 
     return (
         <>
-            {boxes.map((props, index) => (
+            {boxes.map((props, index) => {
+                const cell = cells[index];
+
+                return (
+                    <>
+                        <Box key={`cell-${index}`} {...props} />
+                        {cell.piece && cell.side && (
+                            <Piece
+                                cellPosition={props.position}
+                                piece={cell.piece}
+                                side={cell.side}
+                            />
+                        )}
+                    </>
+                );
+            })}
+            {borders.map((props, index) => (
                 <Box key={`cell-${index}`} {...props} />
             ))}
         </>
