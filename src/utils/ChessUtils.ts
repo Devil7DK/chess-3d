@@ -1,4 +1,4 @@
-import { Point2D } from '../types';
+import { CellState, ChessPiece, Point2D, Tuple } from '../types';
 
 export function getRowColumnFromIndex(index: number) {
     const row = Math.ceil((index + 1) / 8);
@@ -43,4 +43,67 @@ export function get2DPointInGrid(
             : centerPoint.y + (row - 5) * cellSize + cellSize / 2;
 
     return { x, y };
+}
+
+const pieceSerializationMap: Record<ChessPiece, string> = {
+    king: 'A',
+    queen: 'B',
+    rook: 'C',
+    bishop: 'D',
+    knight: 'E',
+    pawn: 'F',
+};
+
+const pieceDeserializationMap: Record<string, ChessPiece> = Object.fromEntries(
+    Object.entries(pieceSerializationMap).map(([key, value]) => [
+        value,
+        key as ChessPiece,
+    ])
+);
+
+export function serialize(cells: Tuple<CellState, 64>): string {
+    return cells
+        .map((cell) =>
+            cell.piece
+                ? pieceSerializationMap[cell.piece][
+                      cell.side === 'black' ? 'toUpperCase' : 'toLowerCase'
+                  ]()
+                : '0'
+        )
+        .join('');
+}
+
+export function deserialize(data: string): Tuple<CellState, 64> {
+    if (data.length !== 64) throw new Error('Invalid data! Length mismatch!');
+
+    return data.split('').map<CellState>((char, index) => {
+        const { column, row } = getRowColumnFromIndex(index);
+
+        const color =
+            row % 2
+                ? column % 2
+                    ? 'white'
+                    : 'black'
+                : column % 2
+                ? 'black'
+                : 'white';
+        const piece = pieceDeserializationMap[char.toUpperCase()];
+
+        const charCode = char.charCodeAt(0);
+        const side =
+            charCode >= 65 && charCode <= 70
+                ? 'black'
+                : charCode >= 97 && charCode <= 102
+                ? 'white'
+                : undefined;
+
+        return {
+            index,
+            column,
+            row,
+            color,
+            piece,
+            side,
+        };
+    }) as Tuple<CellState, 64>;
 }
