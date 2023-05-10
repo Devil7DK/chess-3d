@@ -1,11 +1,6 @@
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useTexture } from '@react-three/drei';
 import React, { useMemo } from 'react';
-import {
-    MathUtils,
-    Mesh,
-    MeshStandardMaterial,
-    Vector3
-} from 'three';
+import { MathUtils, Mesh, MeshStandardMaterial, Vector3 } from 'three';
 import { GLTF } from 'three-stdlib';
 
 import Bishop from '../../assets/models/Bishop.gltf';
@@ -14,6 +9,8 @@ import Knight from '../../assets/models/Knight.gltf';
 import Pawn from '../../assets/models/Pawn.gltf';
 import Queen from '../../assets/models/Queen.gltf';
 import Rook from '../../assets/models/Rook.gltf';
+import WoodBlack from '../../assets/textures/wood-black.jpg';
+import WoodWhite from '../../assets/textures/wood-white.jpg';
 import { Point3D } from '../../types';
 import { get2DPointInGrid } from '../../utils';
 
@@ -56,6 +53,8 @@ export const Piece: React.FC<IPieceProps> = ({
             : Rook
     ) as GLTFResult;
 
+    const texture = useTexture(color === 'black' ? WoodBlack : WoodWhite);
+
     const { geometry, material } = useMemo(() => {
         return {
             geometry: gltf.nodes.mesh01.geometry.clone(),
@@ -79,7 +78,7 @@ export const Piece: React.FC<IPieceProps> = ({
             <mesh
                 geometry={geometry}
                 material={material}
-                material-color={color}
+                material-map={texture}
                 rotation={[
                     MathUtils.degToRad(270),
                     0,
