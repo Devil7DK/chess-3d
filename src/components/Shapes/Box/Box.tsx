@@ -52,7 +52,7 @@ export const Box: React.FC<IBoxProps> = ({
     });
 
     return (
-        <mesh ref={ref}>
+        <mesh ref={ref} receiveShadow>
             <boxGeometry args={[width, height, length]} attach='geometry' />
             {Array.isArray(color) || Array.isArray(textures) ? (
                 new Array(6).fill('').map((_, index) => {

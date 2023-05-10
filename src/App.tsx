@@ -7,7 +7,9 @@ import { Scene } from './Scene';
 export const App: React.FC = () => {
     return (
         <>
-            <Scene />
+            <React.Suspense fallback={null}>
+                <Scene />
+            </React.Suspense>
         </>
     );
 };
