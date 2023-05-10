@@ -4,4 +4,12 @@ div#root {
 
     display: flex;
     flex-direction: column;
+
+    div.overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        opacity: 0.7;
+    }
 }
