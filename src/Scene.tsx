@@ -40,8 +40,7 @@ export const Scene: React.FC = () => {
                     fov: 40,
                 }}
             >
-                <color attach='background' args={['#202030']} />
-                <Suspense>
+                <color attach='background' args={['#8b6b55']} />
                     <Stage environment={environment} intensity={0.6}>
                         <Board
                             borderColor='grey'

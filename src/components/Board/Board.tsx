@@ -1,6 +1,10 @@
 import React, { useMemo } from 'react';
-import { CanvasTexture, ColorRepresentation } from 'three';
+import { ColorRepresentation } from 'three';
 
+import { useTexture } from '@react-three/drei';
+import WoodBlack from '../../assets/textures/wood-black.jpg';
+import WoodBrown from '../../assets/textures/wood-brown.jpg';
+import WoodWhite from '../../assets/textures/wood-white.jpg';
 import { Point3D } from '../../types';
 import { get2DPointInGrid } from '../../utils';
 import { useChessState } from '../../utils/ChessState';
@@ -24,38 +28,27 @@ export const Board: React.FC<IBoardProps> = ({
 }) => {
     const { cells } = useChessState();
 
+    const blackTexture = useTexture(WoodBlack);
+    const brownTexture = useTexture(WoodBrown);
+    const whiteTexture = useTexture(WoodWhite);
+
     const boxes = useMemo<IBoxProps[]>(() => {
         const boxes = cells.map<IBoxProps>((cell, index) => {
             const { row, column, color } = cell;
             const { x, y } = get2DPointInGrid(cellSize, position, row, column);
-
-            const textCanvas = document.createElement('canvas');
-            textCanvas.width = 100;
-            textCanvas.height = 100;
-            const textContext = textCanvas.getContext('2d');
-            if (textContext) {
-                textContext.fillStyle = color;
-                textContext.fillRect(0, 0, textCanvas.width, textCanvas.height);
-                textContext.fillStyle = color === 'black' ? 'white' : 'black';
-                textContext.font = '50px serif';
-                textContext.textAlign = 'center';
-                textContext.textBaseline = 'middle';
-                textContext.fillText(index.toString(), 50, 50);
-            }
 
             return {
                 position: { x, z: y, y: position.y },
                 height: thickness,
                 width: cellSize,
                 length: cellSize,
-                color: [color, color, color, borderColor, color, color],
                 textures: [
-                    null,
-                    null,
-                    new CanvasTexture(textCanvas),
-                    null,
-                    null,
-                    null,
+                    brownTexture,
+                    brownTexture,
+                    color === 'black' ? blackTexture : whiteTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
                 ],
             };
         });
@@ -73,40 +66,18 @@ export const Board: React.FC<IBoardProps> = ({
             const y = cell.position.y;
             const z = cell.position.z - cellSize / 2 - borderWidth / 2;
 
-            const textCanvas = document.createElement('canvas');
-            textCanvas.width = cellSize * 100;
-            textCanvas.height = borderWidth * 100;
-            const textContext = textCanvas.getContext('2d');
-            if (textContext) {
-                textContext.fillStyle =
-                    typeof borderColor === 'string'
-                        ? borderColor
-                        : borderColor.toString();
-                textContext.fillRect(0, 0, textCanvas.width, textCanvas.height);
-                textContext.fillStyle = 'white';
-                textContext.font = `${cellSize * 30}px serif`;
-                textContext.textAlign = 'center';
-                textContext.textBaseline = 'middle';
-                textContext.fillText(
-                    String.fromCharCode(65 + i),
-                    cellSize * 50,
-                    borderWidth * 50
-                );
-            }
-
             const point1: IBoxProps = {
-                color: borderColor,
                 height: thickness,
                 length: borderWidth,
                 width: cellSize,
                 position: { x, y, z },
                 textures: [
-                    null,
-                    null,
-                    new CanvasTexture(textCanvas),
-                    null,
-                    null,
-                    null,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
                 ],
             };
 
@@ -129,40 +100,18 @@ export const Board: React.FC<IBoardProps> = ({
             const y = cell.position.y;
             const z = cell.position.z;
 
-            const textCanvas = document.createElement('canvas');
-            textCanvas.width = borderWidth * 100;
-            textCanvas.height = cellSize * 100;
-            const textContext = textCanvas.getContext('2d');
-            if (textContext) {
-                textContext.fillStyle =
-                    typeof borderColor === 'string'
-                        ? borderColor
-                        : borderColor.toString();
-                textContext.fillRect(0, 0, textCanvas.width, textCanvas.height);
-                textContext.fillStyle = 'white';
-                textContext.font = `${cellSize * 30}px serif`;
-                textContext.textAlign = 'center';
-                textContext.textBaseline = 'middle';
-                textContext.fillText(
-                    String(i + 1),
-                    borderWidth * 50,
-                    cellSize * 50
-                );
-            }
-
             const point1: IBoxProps = {
-                color: borderColor,
                 height: thickness,
                 length: cellSize,
                 width: borderWidth,
                 position: { x, y, z },
                 textures: [
-                    null,
-                    null,
-                    new CanvasTexture(textCanvas),
-                    null,
-                    null,
-                    null,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
+                    brownTexture,
                 ],
             };
 
@@ -184,7 +133,6 @@ export const Board: React.FC<IBoardProps> = ({
         const bottomRightCell = boxes[63];
 
         const corner: IBoxProps = {
-            color: borderColor,
             height: thickness,
             length: borderWidth,
             width: borderWidth,
@@ -193,6 +141,14 @@ export const Board: React.FC<IBoardProps> = ({
                 y: topLeftCell.position.y,
                 z: topLeftCell.position.z - cellSize / 2 - borderWidth / 2,
             },
+            textures: [
+                brownTexture,
+                brownTexture,
+                brownTexture,
+                brownTexture,
+                brownTexture,
+                brownTexture,
+            ],
         };
 
         border.push(corner);
