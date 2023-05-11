@@ -32,15 +32,27 @@ export const Scene: React.FC = () => {
                     <option value='lobby'>lobby</option>
                 </select>
             </div>
-            <Canvas
-                shadows
-                dpr={[1, 2]}
-                camera={{
-                    position: [0, 0, 150],
-                    fov: 40,
-                }}
+            <Suspense
+                fallback={
+                    <div className='fullscreen-loader'>
+                        <div className='spinner'>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                }
             >
-                <color attach='background' args={['#8b6b55']} />
+                <Canvas
+                    shadows
+                    dpr={[1, 2]}
+                    camera={{
+                        position: [0, 0, 150],
+                        fov: 40,
+                    }}
+                >
+                    <color attach='background' args={['#8b6b55']} />
                     <Stage environment={environment} intensity={0.6}>
                         <Board
                             borderColor='grey'
@@ -50,10 +62,9 @@ export const Scene: React.FC = () => {
                             thickness={1}
                         />
                     </Stage>
-                </Suspense>
-
-                <OrbitControls />
-            </Canvas>
+                    <OrbitControls />
+                </Canvas>
+            </Suspense>
         </>
     );
 };
