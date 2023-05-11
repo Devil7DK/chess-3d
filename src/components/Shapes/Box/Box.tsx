@@ -12,7 +12,7 @@ import {
 import { Box as BoxType } from '../../../types';
 
 export interface IBoxProps extends BoxType {
-    color:
+    color?:
         | ColorRepresentation
         | [
               ColorRepresentation,
