@@ -32,6 +32,7 @@ export const Piece: React.FC<IPieceProps> = ({
     piece,
     side,
     cellPosition,
+    onClick,
     ...props
 }) => {
     const gltf = useGLTF(
@@ -81,6 +82,7 @@ export const Piece: React.FC<IPieceProps> = ({
                             : MathUtils.degToRad(270)
                         : 0,
                 ]}
+                onClick={onClick}
                 castShadow
                 receiveShadow
             />

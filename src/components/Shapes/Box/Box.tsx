@@ -1,4 +1,4 @@
-import { useFrame } from '@react-three/fiber';
+import { ThreeEvent, useFrame } from '@react-three/fiber';
 import React, { useRef } from 'react';
 import {
     BufferGeometry,
@@ -30,6 +30,7 @@ export interface IBoxProps extends BoxType {
         Texture | null,
         Texture | null
     ];
+    onClick?: (e: ThreeEvent<MouseEvent>) => void;
 }
 
 export const Box: React.FC<IBoxProps> = ({
@@ -39,6 +40,7 @@ export const Box: React.FC<IBoxProps> = ({
     position,
     width,
     textures,
+    onClick,
 }) => {
     const ref =
         useRef<
@@ -52,7 +54,7 @@ export const Box: React.FC<IBoxProps> = ({
     });
 
     return (
-        <mesh ref={ref} receiveShadow>
+        <mesh ref={ref} onClick={onClick} receiveShadow>
             <boxGeometry args={[width, height, length]} attach='geometry' />
             {Array.isArray(color) || Array.isArray(textures) ? (
                 new Array(6).fill('').map((_, index) => {
