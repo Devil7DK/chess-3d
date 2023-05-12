@@ -1,12 +1,11 @@
+import { CellPosition } from './CellPosition';
 import { ChessPiece } from './ChessPiece';
 import { Side } from './Side';
 
-export type CellState = {
+export type CellState = CellPosition & {
     index: number;
-    row: number;
-    column: number;
     color: 'black' | 'white';
     piece?: ChessPiece;
     side?: Side;
-    possibleMoves?: number[][];
+    possibleMoves?: number[];
 };
