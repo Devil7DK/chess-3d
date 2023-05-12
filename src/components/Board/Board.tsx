@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ColorRepresentation, Vector3 } from 'three';
 
 import { useTexture } from '@react-three/drei';
@@ -27,17 +27,26 @@ export const Board: React.FC<IBoardProps> = ({
     position,
     thickness,
 }) => {
-    const { cells } = useChessState();
+    const { cells, selectedCell, playingSide, selectCell, moveTo } =
+        useChessState();
 
     const blackTexture = useTexture(WoodBlack);
     const brownTexture = useTexture(WoodBrown);
     const whiteTexture = useTexture(WoodWhite);
 
-    const [selectedCell, setSelectedCell] = useState<number>();
+    const onClick = (index: number) => {
+        if (!selectedCell) {
+            selectCell(index);
+        } else {
+            if (selectedCell !== index) {
+                const cell = cells[index];
 
-    const onCellClick = (index: number) => {
-        if (!selectedCell || selectedCell === index) {
-            setSelectedCell(index);
+                if (cell.side === playingSide) {
+                    selectCell(index);
+                } else {
+                    moveTo(index);
+                }
+            }
         }
     };
 
@@ -195,12 +204,8 @@ export const Board: React.FC<IBoardProps> = ({
                 const cell = cells[index];
 
                 return (
-                    <>
-                        <Box
-                            key={`cell-${index}`}
-                            {...props}
-                            onClick={() => onCellClick(index)}
-                        />
+                    <React.Fragment key={`cell-${index}`}>
+                        <Box {...props} onClick={() => onClick(index)} />
                         {cell.piece && cell.side && (
                             <Piece
                                 cellPosition={props.position}
@@ -208,7 +213,7 @@ export const Board: React.FC<IBoardProps> = ({
                                 side={cell.side}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setSelectedCell(index);
+                                    onClick(index);
                                 }}
                             />
                         )}
@@ -257,7 +262,7 @@ export const Board: React.FC<IBoardProps> = ({
                                     })}
                             </>
                         )}
-                    </>
+                    </React.Fragment>
                 );
             })}
             {borders.map((props, index) => (
