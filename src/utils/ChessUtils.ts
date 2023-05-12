@@ -1,5 +1,6 @@
 import { CellState, ChessPiece, Point2D, Tuple } from '../types';
 
+// #region Grid
 export function getRowColumnFromIndex(index: number) {
     const row = Math.ceil((index + 1) / 8);
     const column = (index % 8) + 1;
@@ -44,7 +45,9 @@ export function get2DPointInGrid(
 
     return { x, y };
 }
+// #endregion Grid
 
+// #region Serialization
 const pieceSerializationMap: Record<ChessPiece, string> = {
     king: 'A',
     queen: 'B',
@@ -107,3 +110,4 @@ export function deserialize(data: string): Tuple<CellState, 64> {
         };
     }) as Tuple<CellState, 64>;
 }
+// #endregion Serialization
