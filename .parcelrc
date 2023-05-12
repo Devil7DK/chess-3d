@@ -1,14 +1,14 @@
 {
     "extends": "@parcel/config-default",
     "compressors": {
-        "*.{html,css,js,svg,map,png,jpg,gltf}": [
+        "*.{html,css,js,svg,map,png,jpg,gltf,glb}": [
             "...",
             "@parcel/compressor-gzip",
             "@parcel/compressor-brotli"
         ]
     },
     "transformers": {
-        "*.gltf": [
+        "*.{gltf,glb}": [
             "@parcel/transformer-raw"
         ]
     }
