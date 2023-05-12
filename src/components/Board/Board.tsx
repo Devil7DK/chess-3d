@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { ColorRepresentation } from 'three';
+import React, { useMemo, useState } from 'react';
+import { ColorRepresentation, Vector3 } from 'three';
 
 import { useTexture } from '@react-three/drei';
 import WoodBlack from '../../assets/textures/wood-black.jpg';
@@ -8,6 +8,7 @@ import WoodWhite from '../../assets/textures/wood-white.jpg';
 import { Point3D } from '../../types';
 import { get2DPointInGrid } from '../../utils';
 import { useChessState } from '../../utils/ChessState';
+import { Frame } from '../Frame';
 import { Piece } from '../Piece';
 import { Box, IBoxProps } from '../Shapes';
 
@@ -31,6 +32,14 @@ export const Board: React.FC<IBoardProps> = ({
     const blackTexture = useTexture(WoodBlack);
     const brownTexture = useTexture(WoodBrown);
     const whiteTexture = useTexture(WoodWhite);
+
+    const [selectedCell, setSelectedCell] = useState<number>();
+
+    const onCellClick = (index: number) => {
+        if (!selectedCell || selectedCell === index) {
+            setSelectedCell(index);
+        }
+    };
 
     const boxes = useMemo<IBoxProps[]>(() => {
         const boxes = cells.map<IBoxProps>((cell, index) => {
@@ -187,13 +196,66 @@ export const Board: React.FC<IBoardProps> = ({
 
                 return (
                     <>
-                        <Box key={`cell-${index}`} {...props} />
+                        <Box
+                            key={`cell-${index}`}
+                            {...props}
+                            onClick={() => onCellClick(index)}
+                        />
                         {cell.piece && cell.side && (
                             <Piece
                                 cellPosition={props.position}
                                 piece={cell.piece}
                                 side={cell.side}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedCell(index);
+                                }}
                             />
+                        )}
+                        {selectedCell === index && (
+                            <>
+                                {cells[index].piece && (
+                                    <Frame
+                                        color={
+                                            cells[index].possibleMoves?.length
+                                                ? 'white'
+                                                : 'red'
+                                        }
+                                        cellSize={cellSize}
+                                        boardThickness={thickness}
+                                        position={
+                                            new Vector3(
+                                                props.position.x,
+                                                props.position.y + 0.5,
+                                                props.position.z
+                                            )
+                                        }
+                                    />
+                                )}
+                                {cell.possibleMoves &&
+                                    cell.possibleMoves.map((index) => {
+                                        const box = boxes[index];
+
+                                        if (!box) {
+                                            console.log(cell);
+                                            return null;
+                                        }
+
+                                        return (
+                                            <Frame
+                                                cellSize={cellSize}
+                                                boardThickness={thickness}
+                                                position={
+                                                    new Vector3(
+                                                        box.position.x,
+                                                        box.position.y + 0.5,
+                                                        box.position.z
+                                                    )
+                                                }
+                                            />
+                                        );
+                                    })}
+                            </>
                         )}
                     </>
                 );
