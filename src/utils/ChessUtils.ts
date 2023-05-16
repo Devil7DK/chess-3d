@@ -441,6 +441,27 @@ export function getPossiblePositions(
                         possiblePositions.push(position);
                     }
                 }
+
+                const diagonalPosition1 = {
+                    row: side === 'black' ? row - 1 : row + 1,
+                    column: column + 1,
+                };
+                const index1 = getIndexFromRowColumn(diagonalPosition1);
+                const cell1 = cells[index1];
+                if (cell1 && cell1.piece && cell1.side !== side) {
+                    possiblePositions.push(diagonalPosition1);
+                }
+
+                const diagonalPosition2 = {
+                    row: side === 'black' ? row - 1 : row + 1,
+                    column: column - 1,
+                };
+                const index2 = getIndexFromRowColumn(diagonalPosition2);
+                const cell2 = cells[index2];
+                if (cell2 && cell2.piece && cell2.side !== side) {
+                    possiblePositions.push(diagonalPosition2);
+                }
+
                 break;
         }
 
