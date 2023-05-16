@@ -260,13 +260,13 @@ function getDiagonalPositions(
         const cell = cells[index];
         if (cell && cell.piece) {
             if (cell.side !== side) {
-                positions.push(position);
+                positions.push({ ...position });
             }
 
             break;
         }
 
-        positions.push(position);
+        positions.push({ ...position });
     }
 
     for (
@@ -282,13 +282,13 @@ function getDiagonalPositions(
         const cell = cells[index];
         if (cell && cell.piece) {
             if (cell.side !== side) {
-                positions.push(position);
+                positions.push({ ...position });
             }
 
             break;
         }
 
-        positions.push(position);
+        positions.push({ ...position });
     }
 
     for (
@@ -304,13 +304,13 @@ function getDiagonalPositions(
         const cell = cells[index];
         if (cell && cell.piece) {
             if (cell.side !== side) {
-                positions.push(position);
+                positions.push({ ...position });
             }
 
             break;
         }
 
-        positions.push(position);
+        positions.push({ ...position });
     }
 
     for (
@@ -326,13 +326,13 @@ function getDiagonalPositions(
         const cell = cells[index];
         if (cell && cell.piece) {
             if (cell.side !== side) {
-                positions.push(position);
+                positions.push({ ...position });
             }
 
             break;
         }
 
-        positions.push(position);
+        positions.push({ ...position });
     }
 
     return positions;
