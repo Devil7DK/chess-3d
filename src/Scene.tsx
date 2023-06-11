@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import React, { Suspense, useState } from 'react';
 
 import { Board } from './components';
+import { ChessStateProvider } from './utils/ChessState';
 
 export const Scene: React.FC = () => {
     const [environment, setEnvironment] = useState<PresetsType>(
@@ -54,13 +55,15 @@ export const Scene: React.FC = () => {
                 >
                     <color attach='background' args={['#8b6b55']} />
                     <Stage environment={environment} intensity={0.6}>
-                        <Board
-                            borderColor='grey'
-                            borderWidth={2}
-                            cellSize={5}
-                            position={{ x: 0, y: -0.5, z: 0 }}
-                            thickness={1}
-                        />
+                        <ChessStateProvider>
+                            <Board
+                                borderColor='grey'
+                                borderWidth={2}
+                                cellSize={5}
+                                position={{ x: 0, y: -0.5, z: 0 }}
+                                thickness={1}
+                            />
+                        </ChessStateProvider>
                     </Stage>
                     <OrbitControls />
                 </Canvas>

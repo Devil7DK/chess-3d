@@ -3,7 +3,6 @@ import './App.scss';
 import React, { useEffect } from 'react';
 
 import { Scene } from './Scene';
-import { ChessStateProvider } from './utils/ChessState';
 
 export const App: React.FC = () => {
     useEffect(() => {
@@ -17,9 +16,7 @@ export const App: React.FC = () => {
 
     return (
         <>
-            <ChessStateProvider>
-                <Scene />
-            </ChessStateProvider>
+            <Scene />
         </>
     );
 };
