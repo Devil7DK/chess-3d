@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { ColorRepresentation, Vector3 } from 'three';
 
 import { useTexture } from '@react-three/drei';
@@ -27,8 +27,14 @@ export const Board: React.FC<IBoardProps> = ({
     position,
     thickness,
 }) => {
-    const { cells, selectedCell, playingSide, selectCell, moveTo } =
-        useChessState();
+    const {
+        capturedPieces,
+        cells,
+        selectedCell,
+        playingSide,
+        selectCell,
+        moveTo,
+    } = useChessState();
 
     const blackTexture = useTexture(WoodBlack);
     const brownTexture = useTexture(WoodBrown);
@@ -268,6 +274,35 @@ export const Board: React.FC<IBoardProps> = ({
             {borders.map((props, index) => (
                 <Box key={`cell-${index}`} {...props} />
             ))}
+            {Object.entries(capturedPieces).reduce<ReactNode[]>(
+                (nodes, [side, pieces]) =>
+                    pieces.reduce(
+                        (nodes, piece, index, arr) => (
+                            nodes.push(
+                                <Piece
+                                    cellPosition={{
+                                        x:
+                                            position.x +
+                                            cellSize *
+                                                5 *
+                                                (side === 'black' ? 1 : -1),
+                                        y: position.y - thickness,
+                                        z:
+                                            position.z -
+                                            (arr.length / 2) * cellSize +
+                                            cellSize / 2 +
+                                            cellSize * index,
+                                    }}
+                                    piece={piece}
+                                    side={side === 'black' ? 'white' : 'black'}
+                                />
+                            ),
+                            nodes
+                        ),
+                        nodes
+                    ),
+                []
+            )}
         </>
     );
 };

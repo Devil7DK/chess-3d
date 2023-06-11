@@ -66,11 +66,12 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
                         }
 
                         if (targetCell.piece && targetCell.side) {
+                            const capturedPiece = targetCell.piece;
                             setCapturedPieces((value) => ({
                                 ...value,
                                 [playingSide]: [
                                     ...value[playingSide],
-                                    targetCell.piece,
+                                    capturedPiece,
                                 ],
                             }));
                         }
