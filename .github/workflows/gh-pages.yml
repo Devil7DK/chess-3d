@@ -13,7 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Node ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Enable Corepack 🔛
+        run: corepack enable
+
+      - name: Setup Caching ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "yarn"
+          cache-dependency-path: "yarn.lock"
 
       - name: Install and Build 🔧
         run: |

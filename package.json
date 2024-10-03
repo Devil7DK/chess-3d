@@ -7,24 +7,25 @@
     "build": "parcel build src/index.html --public-url ./"
   },
   "dependencies": {
-    "@react-three/drei": "^9.66.6",
-    "@react-three/fiber": "^8.13.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router": "^6.11.1",
-    "three": "^0.152.2",
-    "three-stdlib": "^2.21.11"
+    "@react-three/drei": "^9.114.0",
+    "@react-three/fiber": "^8.17.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^6.26.2",
+    "three": "^0.169.0",
+    "three-stdlib": "^2.33.0"
   },
   "devDependencies": {
-    "@parcel/compressor-brotli": "^2.8.3",
-    "@parcel/compressor-gzip": "^2.8.3",
-    "@parcel/transformer-sass": "2.8.3",
-    "@types/react": "^18.2.6",
-    "@types/react-dom": "^18.2.4",
-    "@types/three": "^0.152.0",
-    "buffer": "^5.5.0",
-    "parcel": "^2.8.3",
+    "@parcel/compressor-brotli": "^2.12.0",
+    "@parcel/compressor-gzip": "^2.12.0",
+    "@parcel/transformer-sass": "2.12.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.169.0",
+    "buffer": "^6.0.3",
+    "parcel": "^2.12.0",
     "process": "^0.11.10",
-    "typescript": "^5.0.4"
-  }
+    "typescript": "^5.6.2"
+  },
+  "packageManager": "yarn@4.3.1+sha512.af78262d7d125afbfeed740602ace8c5e4405cd7f4735c08feb327286b2fdb2390fbca01589bfd1f50b1240548b74806767f5a063c94b67e431aabd0d86f7774"
 }
