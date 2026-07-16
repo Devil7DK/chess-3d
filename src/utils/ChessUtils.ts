@@ -12,7 +12,7 @@ export function getIndexFromRowColumn(cellPosition: CellPosition): number;
 export function getIndexFromRowColumn(row: number, column: number): number;
 export function getIndexFromRowColumn(
     rowOrCell: CellPosition | number,
-    column?: number
+    column?: number,
 ) {
     return typeof rowOrCell === 'object'
         ? (rowOrCell.row - 1) * 8 + (rowOrCell.column - 1)
@@ -29,19 +29,19 @@ export function getRowColumnFromIndex(index: number) {
 export function get2DPointInGrid(
     cellSize: number,
     centerPoint: Point2D,
-    index: number
+    index: number,
 ): Point2D;
 export function get2DPointInGrid(
     cellSize: number,
     centerPoint: Point2D,
     row: number,
-    column?: number
+    column?: number,
 ): Point2D;
 export function get2DPointInGrid(
     cellSize: number,
     centerPoint: Point2D,
     rowOrIndex: number,
-    column?: number
+    column?: number,
 ): Point2D {
     const row =
         column === undefined
@@ -79,7 +79,7 @@ const pieceDeserializationMap: Record<string, ChessPiece> = Object.fromEntries(
     Object.entries(pieceSerializationMap).map(([key, value]) => [
         value,
         key as ChessPiece,
-    ])
+    ]),
 );
 
 export function serialize(cells: Tuple<CellState, 64>): string {
@@ -89,7 +89,7 @@ export function serialize(cells: Tuple<CellState, 64>): string {
                 ? pieceSerializationMap[cell.piece][
                       cell.side === 'black' ? 'toUpperCase' : 'toLowerCase'
                   ]()
-                : '0'
+                : '0',
         )
         .join('');
 }
@@ -106,8 +106,8 @@ export function deserialize(data: string): Tuple<CellState, 64> {
                     ? 'white'
                     : 'black'
                 : column % 2
-                ? 'black'
-                : 'white';
+                  ? 'black'
+                  : 'white';
         const piece = pieceDeserializationMap[char.toUpperCase()];
 
         const charCode = char.charCodeAt(0);
@@ -115,8 +115,8 @@ export function deserialize(data: string): Tuple<CellState, 64> {
             charCode >= 65 && charCode <= 70
                 ? 'black'
                 : charCode >= 97 && charCode <= 102
-                ? 'white'
-                : undefined;
+                  ? 'white'
+                  : undefined;
 
         return {
             index,
@@ -159,7 +159,7 @@ function occupiedPositions(cells: Tuple<CellState, 64>, side: Side) {
 function getHorizontalPositions(
     cells: Tuple<CellState, 64>,
     cellPosition: CellPosition,
-    side: Side
+    side: Side,
 ) {
     const positions: CellPosition[] = [];
 
@@ -201,7 +201,7 @@ function getHorizontalPositions(
 function getVerticalPositions(
     cells: Tuple<CellState, 64>,
     cellPosition: CellPosition,
-    side: Side
+    side: Side,
 ) {
     const positions: CellPosition[] = [];
 
@@ -243,7 +243,7 @@ function getVerticalPositions(
 function getDiagonalPositions(
     cells: Tuple<CellState, 64>,
     cellPosition: CellPosition,
-    side: Side
+    side: Side,
 ) {
     const positions: CellPosition[] = [];
 
@@ -340,7 +340,7 @@ function getDiagonalPositions(
 
 export function getPossiblePositions(
     cells: Tuple<CellState, 64>,
-    index: number
+    index: number,
 ): number[] | undefined {
     const { column, row, piece, side } = cells[index];
 
@@ -377,7 +377,7 @@ export function getPossiblePositions(
                 possiblePositions = getDiagonalPositions(
                     cells,
                     { row, column },
-                    side
+                    side,
                 );
                 break;
             case 'knight':

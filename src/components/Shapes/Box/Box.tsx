@@ -20,7 +20,7 @@ export interface IBoxProps extends BoxType {
               ColorRepresentation,
               ColorRepresentation,
               ColorRepresentation,
-              ColorRepresentation
+              ColorRepresentation,
           ];
     textures?: [
         Texture | null,
@@ -28,7 +28,7 @@ export interface IBoxProps extends BoxType {
         Texture | null,
         Texture | null,
         Texture | null,
-        Texture | null
+        Texture | null,
     ];
     onClick?: (e: ThreeEvent<MouseEvent>) => void;
 }

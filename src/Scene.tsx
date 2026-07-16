@@ -8,7 +8,7 @@ import { ChessStateProvider } from './utils/ChessState';
 
 export const Scene: React.FC = () => {
     const [environment, setEnvironment] = useState<PresetsType>(
-        (localStorage.getItem('environment') as PresetsType) || 'sunset'
+        (localStorage.getItem('environment') as PresetsType) || 'sunset',
     );
 
     return (

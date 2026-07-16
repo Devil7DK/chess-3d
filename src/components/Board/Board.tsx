@@ -238,7 +238,7 @@ export const Board: React.FC<IBoardProps> = ({
                                             new Vector3(
                                                 props.position.x,
                                                 props.position.y + 0.5,
-                                                props.position.z
+                                                props.position.z,
                                             )
                                         }
                                     />
@@ -260,7 +260,7 @@ export const Board: React.FC<IBoardProps> = ({
                                                     new Vector3(
                                                         box.position.x,
                                                         box.position.y + 0.5,
-                                                        box.position.z
+                                                        box.position.z,
                                                     )
                                                 }
                                             />
@@ -295,13 +295,13 @@ export const Board: React.FC<IBoardProps> = ({
                                     }}
                                     piece={piece}
                                     side={side === 'black' ? 'white' : 'black'}
-                                />
+                                />,
                             ),
                             nodes
                         ),
-                        nodes
+                        nodes,
                     ),
-                []
+                [],
             )}
         </>
     );

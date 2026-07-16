@@ -39,14 +39,14 @@ export const Piece: React.FC<IPieceProps> = ({
         piece === 'bishop'
             ? Bishop
             : piece === 'king'
-            ? King
-            : piece === 'knight'
-            ? Knight
-            : piece === 'pawn'
-            ? Pawn
-            : piece === 'queen'
-            ? Queen
-            : Rook
+              ? King
+              : piece === 'knight'
+                ? Knight
+                : piece === 'pawn'
+                  ? Pawn
+                  : piece === 'queen'
+                    ? Queen
+                    : Rook,
     ) as GLTFResult;
 
     const texture = useTexture(side === 'black' ? WoodBlack : WoodWhite);

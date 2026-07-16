@@ -9,7 +9,7 @@ import { ChessState, Side } from '../types';
 import { deserialize, getPossiblePositions } from './ChessUtils';
 
 const ChessStateContext = createContext<ChessState>(
-    {} as unknown as ChessState
+    {} as unknown as ChessState,
 );
 
 export const useChessState = () => useContext(ChessStateContext);
@@ -23,8 +23,8 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
     const [playingSide, setPlayingSide] = useState<Side>('white');
     const [cells, setCells] = useState(() =>
         deserialize(
-            'cedabdecffffffff00000000000000000000000000000000FFFFFFFFCEDABDEC'
-        )
+            'cedabdecffffffff00000000000000000000000000000000FFFFFFFFCEDABDEC',
+        ),
     );
 
     const [selectedCell, setSelectedCell] = useState<number>();
@@ -36,7 +36,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
                 setSelectedCell(index);
             }
         },
-        [cells, playingSide]
+        [cells, playingSide],
     );
 
     const moveTo = useCallback(
@@ -44,7 +44,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
             if (selectedCell) {
                 setCells((oldCells) => {
                     const newCells = JSON.parse(
-                        JSON.stringify(oldCells)
+                        JSON.stringify(oldCells),
                     ) as typeof oldCells; // Create a deep clone so we can directly modify properties
 
                     const sourceCell = newCells[selectedCell];
@@ -60,7 +60,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
 
                         if (targetCell.side === sourceCell.side) {
                             console.error(
-                                'Invalid move! Cannot capture same side piece!'
+                                'Invalid move! Cannot capture same side piece!',
                             );
                             return oldCells;
                         }
@@ -85,12 +85,12 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
                         for (let i = 0; i < newCells.length; i++) {
                             newCells[i].possibleMoves = getPossiblePositions(
                                 newCells,
-                                i
+                                i,
                             );
                         }
 
                         setPlayingSide((side) =>
-                            side === 'black' ? 'white' : 'black'
+                            side === 'black' ? 'white' : 'black',
                         );
                         setSelectedCell(undefined);
 
@@ -101,7 +101,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
                 });
             }
         },
-        [selectedCell, playingSide]
+        [selectedCell, playingSide],
     );
 
     return (

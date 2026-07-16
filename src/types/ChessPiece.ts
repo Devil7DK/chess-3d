@@ -1,7 +1,2 @@
 export type ChessPiece =
-    | 'king'
-    | 'queen'
-    | 'bishop'
-    | 'knight'
-    | 'rook'
-    | 'pawn';
+    'king' | 'queen' | 'bishop' | 'knight' | 'rook' | 'pawn';
