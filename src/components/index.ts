@@ -6,3 +6,5 @@ export * from './Piece';
 export * from './PromotionPicker';
 export * from './Shapes';
 export * from './StatusBanner';
+export * from './Settings';
+

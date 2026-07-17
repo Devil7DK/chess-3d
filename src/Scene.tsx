@@ -9,6 +9,7 @@ import {
     GameControls,
     IAIPlayerProps,
     PromotionPicker,
+    Settings,
     StatusBanner,
 } from './components';
 import { ChessStateProvider } from './utils/ChessState';
@@ -30,28 +31,13 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
         [ai],
     );
 
+    const setEnvironmentAndStore = (env: PresetsType) => {
+        setEnvironment(env);
+        localStorage.setItem('environment', env);
+    };
+
     return (
         <>
-            <div className='overlay'>
-                <select
-                    value={environment}
-                    onChange={(e) => {
-                        setEnvironment(e.target.value as PresetsType);
-                        localStorage.setItem('environment', e.target.value);
-                    }}
-                >
-                    <option value='sunset'>sunset</option>
-                    <option value='dawn'>dawn</option>
-                    <option value='night'>night</option>
-                    <option value='warehouse'>warehouse</option>
-                    <option value='forest'>forest</option>
-                    <option value='apartment'>apartment</option>
-                    <option value='studio'>studio</option>
-                    <option value='city'>city</option>
-                    <option value='park'>park</option>
-                    <option value='lobby'>lobby</option>
-                </select>
-            </div>
             <Suspense
                 fallback={
                     <div className='fullscreen-loader'>
@@ -91,6 +77,10 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
                             <StatusBanner />
                             <PromotionPicker />
                             <GameControls />
+                            <Settings
+                                environment={environment}
+                                onChangeEnvironment={setEnvironmentAndStore}
+                            />
                         </ChessStateProvider>
                     </Stage>
                     <OrbitControls target={[0, 0, 0]} />

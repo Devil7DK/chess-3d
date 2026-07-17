@@ -87,6 +87,102 @@ div#root {
         }
     }
 
+    div.settings-wrapper {
+        pointer-events: none;
+
+        div.settings-container {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+
+            pointer-events: auto;
+
+            button.settings-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.5rem;
+                border: none;
+                border-radius: 0.5rem;
+
+                background-color: rgba(0, 0, 0, 0.5);
+                color: white;
+                font-family: sans-serif;
+                font-size: 1rem;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.75);
+                }
+
+                svg {
+                    width: 1rem;
+                    height: 1rem;
+                    fill: currentColor;
+                }
+            }
+
+            div.settings-panel {
+                position: absolute;
+                top: 2.75rem;
+                left: 0;
+
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                width: 14rem;
+                padding: 1rem;
+                border-radius: 0.5rem;
+
+                background-color: rgba(0, 0, 0, 0.85);
+                color: white;
+                font-family: sans-serif;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+
+                h3 {
+                    margin: 0;
+                    padding-bottom: 0.5rem;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+                    font-size: 1.1rem;
+                }
+
+                div.setting-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.35rem;
+
+                    label {
+                        color: rgba(255, 255, 255, 0.7);
+                        font-size: 0.85rem;
+                    }
+
+                    select {
+                        padding: 0.375rem 0.5rem;
+                        border: none;
+                        border-radius: 0.375rem;
+
+                        background-color: rgba(255, 255, 255, 0.15);
+                        color: white;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+
+                        option {
+                            background-color: #222;
+                            color: white;
+                        }
+
+                        &:focus {
+                            outline: none;
+                            background-color: rgba(255, 255, 255, 0.25);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     div.main-menu {
         position: fixed;
         inset: 0;
