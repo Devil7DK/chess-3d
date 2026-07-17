@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ColorRepresentation, Vector3 } from 'three';
 
 import { useTexture } from '@react-three/drei';
@@ -27,8 +27,8 @@ export const Board: React.FC<IBoardProps> = ({
     thickness,
 }) => {
     const {
-        capturedPieces,
         cells,
+        pieces,
         selectedCell,
         playingSide,
         status,
@@ -212,6 +212,24 @@ export const Board: React.FC<IBoardProps> = ({
         return border;
     }, [boxes, borderWidth, cellSize, thickness, brownTexture]);
 
+    const capturedTray = useMemo(() => {
+        const tray = new Map<string, { index: number; count: number }>();
+
+        for (const side of ['white', 'black'] as const) {
+            const captured = pieces
+                .filter((piece) => piece.captured && piece.side === side)
+                .sort(
+                    (a, b) => (a.capturedOrder ?? 0) - (b.capturedOrder ?? 0),
+                );
+
+            captured.forEach((piece, index) =>
+                tray.set(piece.id, { index, count: captured.length }),
+            );
+        }
+
+        return tray;
+    }, [pieces]);
+
     return (
         <>
             {boxes.map((props, index) => {
@@ -220,17 +238,6 @@ export const Board: React.FC<IBoardProps> = ({
                 return (
                     <React.Fragment key={`cell-${index}`}>
                         <Box {...props} onClick={() => onClick(index)} />
-                        {cell.piece && cell.side && (
-                            <Piece
-                                cellPosition={props.position}
-                                piece={cell.piece}
-                                side={cell.side}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onClick(index);
-                                }}
-                            />
-                        )}
                         {(status === 'check' || status === 'checkmate') &&
                             selectedCell !== index &&
                             cell.piece === 'king' &&
@@ -300,36 +307,46 @@ export const Board: React.FC<IBoardProps> = ({
             {borders.map((props, index) => (
                 <Box key={`cell-${index}`} {...props} />
             ))}
-            {Object.entries(capturedPieces).reduce<ReactNode[]>(
-                (nodes, [side, pieces]) =>
-                    pieces.reduce(
-                        (nodes, piece, index, arr) => (
-                            nodes.push(
-                                <Piece
-                                    key={`captured-${side}-${index}`}
-                                    cellPosition={{
-                                        x:
-                                            position.x +
-                                            cellSize *
-                                                5 *
-                                                (side === 'black' ? 1 : -1),
-                                        y: position.y - thickness,
-                                        z:
-                                            position.z -
-                                            (arr.length / 2) * cellSize +
-                                            cellSize / 2 +
-                                            cellSize * index,
-                                    }}
-                                    piece={piece}
-                                    side={side === 'black' ? 'white' : 'black'}
-                                />,
-                            ),
-                            nodes
-                        ),
-                        nodes,
-                    ),
-                [],
-            )}
+            {pieces.map((piece) => {
+                if (piece.captured) {
+                    const tray = capturedTray.get(piece.id);
+                    if (!tray) return null;
+
+                    return (
+                        <Piece
+                            key={piece.id}
+                            cellPosition={{
+                                x:
+                                    position.x +
+                                    cellSize *
+                                        5 *
+                                        (piece.side === 'white' ? 1 : -1),
+                                y: position.y - thickness,
+                                z:
+                                    position.z -
+                                    (tray.count / 2) * cellSize +
+                                    cellSize / 2 +
+                                    cellSize * tray.index,
+                            }}
+                            piece={piece.piece}
+                            side={piece.side}
+                        />
+                    );
+                }
+
+                return (
+                    <Piece
+                        key={piece.id}
+                        cellPosition={boxes[piece.cellIndex].position}
+                        piece={piece.piece}
+                        side={piece.side}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onClick(piece.cellIndex);
+                        }}
+                    />
+                );
+            })}
         </>
     );
 };

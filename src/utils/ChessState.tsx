@@ -1,6 +1,13 @@
-import { Chess, Color, PieceSymbol } from 'chess.js';
+import { Chess, Color, PieceSymbol, Square } from 'chess.js';
 import React, { PropsWithChildren, useCallback, useState } from 'react';
-import { CellState, ChessPiece, GameStatus, Side, Tuple } from '../types';
+import {
+    CellState,
+    ChessPiece,
+    GameStatus,
+    PieceState,
+    Side,
+    Tuple,
+} from '../types';
 import { ChessStateContext } from './ChessStateContext';
 import {
     getRowColumnFromIndex,
@@ -77,6 +84,106 @@ function deriveCells(game: Chess): Tuple<CellState, 64> {
     return cells as Tuple<CellState, 64>;
 }
 
+const backRank: ChessPiece[] = [
+    'rook',
+    'knight',
+    'bishop',
+    'queen',
+    'king',
+    'bishop',
+    'knight',
+    'rook',
+];
+
+/**
+ * Rebuilds the piece list (with stable ids) by replaying the game's move
+ * history from the starting position. Handles captures, en passant,
+ * castling rook moves, promotions, and undo (the replay is simply shorter).
+ */
+function derivePieces(game: Chess): PieceState[] {
+    const pieces: PieceState[] = [];
+
+    for (let column = 0; column < 8; column++) {
+        for (const [side, pieceRow, pawnRow] of [
+            ['white', 0, 8],
+            ['black', 56, 48],
+        ] as const) {
+            pieces.push({
+                id: `${side}-${indexToSquare(pieceRow + column)}`,
+                piece: backRank[column],
+                side,
+                cellIndex: pieceRow + column,
+                captured: false,
+            });
+            pieces.push({
+                id: `${side}-${indexToSquare(pawnRow + column)}`,
+                piece: 'pawn',
+                side,
+                cellIndex: pawnRow + column,
+                captured: false,
+            });
+        }
+    }
+
+    let capturedCount = 0;
+
+    for (const move of game.history({ verbose: true })) {
+        const fromIndex = squareToIndex(move.from);
+        const toIndex = squareToIndex(move.to);
+
+        if (move.captured) {
+            // In an en passant capture the captured pawn is not on the
+            // target square but beside the capturing pawn.
+            const captureIndex = move.flags.includes('e')
+                ? squareToIndex(
+                      `${move.to.charAt(0)}${move.from.charAt(1)}` as Square,
+                  )
+                : toIndex;
+
+            const capturedPiece = pieces.find(
+                (piece) => !piece.captured && piece.cellIndex === captureIndex,
+            );
+            if (capturedPiece) {
+                capturedPiece.captured = true;
+                capturedPiece.capturedOrder = capturedCount++;
+            }
+        }
+
+        const movingPiece = pieces.find(
+            (piece) => !piece.captured && piece.cellIndex === fromIndex,
+        );
+        if (movingPiece) {
+            movingPiece.cellIndex = toIndex;
+
+            if (move.promotion) {
+                movingPiece.piece = pieceMap[move.promotion];
+            }
+        }
+
+        const castling = move.flags.includes('k')
+            ? 'k'
+            : move.flags.includes('q')
+              ? 'q'
+              : undefined;
+        if (castling) {
+            const rank = move.color === 'w' ? '1' : '8';
+            const rookFrom = `${castling === 'k' ? 'h' : 'a'}${rank}` as Square;
+            const rookTo = `${castling === 'k' ? 'f' : 'd'}${rank}` as Square;
+
+            const rook = pieces.find(
+                (piece) =>
+                    !piece.captured &&
+                    piece.cellIndex === squareToIndex(rookFrom),
+            );
+            if (rook) {
+                rook.cellIndex = squareToIndex(rookTo);
+            }
+        }
+    }
+
+    return pieces;
+}
+
 function deriveCapturedPieces(game: Chess): Record<Side, ChessPiece[]> {
     const capturedPieces: Record<Side, ChessPiece[]> = {
         black: [],
@@ -107,6 +214,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
     const [game] = useState(() => new Chess());
 
     const [cells, setCells] = useState(() => deriveCells(game));
+    const [pieces, setPieces] = useState(() => derivePieces(game));
     const [capturedPieces, setCapturedPieces] = useState(() =>
         deriveCapturedPieces(game),
     );
@@ -124,6 +232,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
 
     const syncState = useCallback(() => {
         setCells(deriveCells(game));
+        setPieces(derivePieces(game));
         setCapturedPieces(deriveCapturedPieces(game));
         setPlayingSide(sideMap[game.turn()]);
         setStatus(deriveStatus(game));
@@ -217,6 +326,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
             value={{
                 capturedPieces,
                 cells,
+                pieces,
                 selectedCell,
                 playingSide,
                 status,
