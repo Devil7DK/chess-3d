@@ -34,6 +34,15 @@ const sideMap: Record<Color, Side> = {
     b: 'black',
 };
 
+const pieceSymbolMap: Record<ChessPiece, PieceSymbol> = {
+    king: 'k',
+    queen: 'q',
+    rook: 'r',
+    bishop: 'b',
+    knight: 'n',
+    pawn: 'p',
+};
+
 function deriveCells(game: Chess): Tuple<CellState, 64> {
     const board = game.board();
 
@@ -126,38 +135,82 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
         deriveStatus(game),
     );
     const [selectedCell, setSelectedCell] = useState<number>();
+    const [pendingPromotion, setPendingPromotion] = useState<{
+        from: number;
+        to: number;
+    }>();
+
+    const syncState = useCallback(() => {
+        setCells(deriveCells(game));
+        setCapturedPieces(deriveCapturedPieces(game));
+        setPlayingSide(sideMap[game.turn()]);
+        setStatus(deriveStatus(game));
+        setSelectedCell(undefined);
+    }, [game]);
 
     const selectCell = useCallback(
         (index: number) => {
+            if (pendingPromotion) return;
+
             const cell = cells[index];
             if (cell && cell.side === playingSide) {
                 setSelectedCell(index);
             }
         },
-        [cells, playingSide],
+        [cells, playingSide, pendingPromotion],
     );
 
     const moveTo = useCallback(
         (index: number) => {
-            if (selectedCell === undefined) return;
+            if (selectedCell === undefined || pendingPromotion) return;
+
+            const from = indexToSquare(selectedCell);
+            const to = indexToSquare(index);
+
+            const isPromotion = game
+                .moves({ square: from, verbose: true })
+                .some((move) => move.to === to && move.promotion);
+
+            if (isPromotion) {
+                setPendingPromotion({ from: selectedCell, to: index });
+                return;
+            }
+
+            try {
+                game.move({ from, to });
+            } catch {
+                return; // Ignore illegal moves
+            }
+
+            syncState();
+        },
+        [game, selectedCell, pendingPromotion, syncState],
+    );
+
+    const promote = useCallback(
+        (piece: ChessPiece | null) => {
+            if (!pendingPromotion) return;
+
+            setPendingPromotion(undefined);
+
+            if (piece === null) {
+                setSelectedCell(undefined);
+                return; // Promotion cancelled
+            }
 
             try {
                 game.move({
-                    from: indexToSquare(selectedCell),
-                    to: indexToSquare(index),
-                    promotion: 'q', // TODO: Let the player pick the promotion piece
+                    from: indexToSquare(pendingPromotion.from),
+                    to: indexToSquare(pendingPromotion.to),
+                    promotion: pieceSymbolMap[piece],
                 });
             } catch {
                 return; // Ignore illegal moves
             }
 
-            setCells(deriveCells(game));
-            setCapturedPieces(deriveCapturedPieces(game));
-            setPlayingSide(sideMap[game.turn()]);
-            setStatus(deriveStatus(game));
-            setSelectedCell(undefined);
+            syncState();
         },
-        [game, selectedCell],
+        [game, pendingPromotion, syncState],
     );
 
     return (
@@ -168,8 +221,10 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
                 selectedCell,
                 playingSide,
                 status,
+                pendingPromotion,
                 selectCell,
                 moveTo,
+                promote,
             }}
         >
             {children}

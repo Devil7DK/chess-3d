@@ -10,7 +10,9 @@ export type ChessState = {
     selectedCell?: number;
     playingSide: Side;
     status: GameStatus;
+    pendingPromotion?: { from: number; to: number };
 
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;
+    promote: (piece: ChessPiece | null) => void;
 };

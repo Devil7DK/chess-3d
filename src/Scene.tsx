@@ -3,7 +3,7 @@ import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { Canvas } from '@react-three/fiber';
 import React, { Suspense, useState } from 'react';
 
-import { Board, StatusBanner } from './components';
+import { Board, PromotionPicker, StatusBanner } from './components';
 import { ChessStateProvider } from './utils/ChessState';
 
 export const Scene: React.FC = () => {
@@ -64,6 +64,7 @@ export const Scene: React.FC = () => {
                                 thickness={1}
                             />
                             <StatusBanner />
+                            <PromotionPicker />
                         </ChessStateProvider>
                     </Stage>
                     <OrbitControls />
