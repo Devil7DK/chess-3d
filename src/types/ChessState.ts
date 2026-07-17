@@ -1,5 +1,6 @@
 import { CellState } from './CellState';
 import { ChessPiece } from './ChessPiece';
+import { GameStatus } from './GameStatus';
 import { Side } from './Side';
 import { Tuple } from './Tuple';
 
@@ -8,6 +9,7 @@ export type ChessState = {
     cells: Tuple<CellState, 64>;
     selectedCell?: number;
     playingSide: Side;
+    status: GameStatus;
 
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;

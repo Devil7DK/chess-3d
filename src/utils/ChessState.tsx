@@ -6,7 +6,14 @@ import React, {
     useContext,
     useState,
 } from 'react';
-import { CellState, ChessPiece, ChessState, Side, Tuple } from '../types';
+import {
+    CellState,
+    ChessPiece,
+    ChessState,
+    GameStatus,
+    Side,
+    Tuple,
+} from '../types';
 import {
     getRowColumnFromIndex,
     indexToSquare,
@@ -88,6 +95,15 @@ function deriveCapturedPieces(game: Chess): Record<Side, ChessPiece[]> {
     return capturedPieces;
 }
 
+function deriveStatus(game: Chess): GameStatus {
+    if (game.isCheckmate()) return 'checkmate';
+    if (game.isStalemate()) return 'stalemate';
+    if (game.isDraw()) return 'draw';
+    if (game.inCheck()) return 'check';
+
+    return 'playing';
+}
+
 const ChessStateContext = createContext<ChessState>(
     {} as unknown as ChessState,
 );
@@ -105,6 +121,9 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
     );
     const [playingSide, setPlayingSide] = useState<Side>(
         () => sideMap[game.turn()],
+    );
+    const [status, setStatus] = useState<GameStatus>(() =>
+        deriveStatus(game),
     );
     const [selectedCell, setSelectedCell] = useState<number>();
 
@@ -135,6 +154,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
             setCells(deriveCells(game));
             setCapturedPieces(deriveCapturedPieces(game));
             setPlayingSide(sideMap[game.turn()]);
+            setStatus(deriveStatus(game));
             setSelectedCell(undefined);
         },
         [game, selectedCell],
@@ -147,6 +167,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
                 cells,
                 selectedCell,
                 playingSide,
+                status,
                 selectCell,
                 moveTo,
             }}

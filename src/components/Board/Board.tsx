@@ -31,6 +31,7 @@ export const Board: React.FC<IBoardProps> = ({
         cells,
         selectedCell,
         playingSide,
+        status,
         selectCell,
         moveTo,
     } = useChessState();
@@ -222,6 +223,23 @@ export const Board: React.FC<IBoardProps> = ({
                                 }}
                             />
                         )}
+                        {(status === 'check' || status === 'checkmate') &&
+                            selectedCell !== index &&
+                            cell.piece === 'king' &&
+                            cell.side === playingSide && (
+                                <Frame
+                                    color='red'
+                                    cellSize={cellSize}
+                                    boardThickness={thickness}
+                                    position={
+                                        new Vector3(
+                                            props.position.x,
+                                            props.position.y + 0.5,
+                                            props.position.z,
+                                        )
+                                    }
+                                />
+                            )}
                         {selectedCell === index && (
                             <>
                                 {cells[index].piece && (
