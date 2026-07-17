@@ -1,3 +1,4 @@
+import { Chess, Color, PieceSymbol } from 'chess.js';
 import React, {
     PropsWithChildren,
     createContext,
@@ -5,8 +6,87 @@ import React, {
     useContext,
     useState,
 } from 'react';
-import { ChessState, Side } from '../types';
-import { deserialize, getPossiblePositions } from './ChessUtils';
+import { CellState, ChessPiece, ChessState, Side, Tuple } from '../types';
+import {
+    getRowColumnFromIndex,
+    indexToSquare,
+    squareToIndex,
+} from './ChessUtils';
+
+const pieceMap: Record<PieceSymbol, ChessPiece> = {
+    k: 'king',
+    q: 'queen',
+    r: 'rook',
+    b: 'bishop',
+    n: 'knight',
+    p: 'pawn',
+};
+
+const sideMap: Record<Color, Side> = {
+    w: 'white',
+    b: 'black',
+};
+
+function deriveCells(game: Chess): Tuple<CellState, 64> {
+    const board = game.board();
+
+    const cells: CellState[] = [];
+
+    for (let index = 0; index < 64; index++) {
+        const { row, column } = getRowColumnFromIndex(index);
+
+        const color =
+            row % 2
+                ? column % 2
+                    ? 'white'
+                    : 'black'
+                : column % 2
+                  ? 'black'
+                  : 'white';
+
+        const entry = board[8 - row][column - 1];
+
+        const possibleMoves = entry
+            ? [
+                  ...new Set(
+                      game
+                          .moves({
+                              square: indexToSquare(index),
+                              verbose: true,
+                          })
+                          .map((move) => squareToIndex(move.to)),
+                  ),
+              ]
+            : undefined;
+
+        cells.push({
+            index,
+            row,
+            column,
+            color,
+            piece: entry ? pieceMap[entry.type] : undefined,
+            side: entry ? sideMap[entry.color] : undefined,
+            possibleMoves,
+        });
+    }
+
+    return cells as Tuple<CellState, 64>;
+}
+
+function deriveCapturedPieces(game: Chess): Record<Side, ChessPiece[]> {
+    const capturedPieces: Record<Side, ChessPiece[]> = {
+        black: [],
+        white: [],
+    };
+
+    for (const move of game.history({ verbose: true })) {
+        if (move.captured) {
+            capturedPieces[sideMap[move.color]].push(pieceMap[move.captured]);
+        }
+    }
+
+    return capturedPieces;
+}
 
 const ChessStateContext = createContext<ChessState>(
     {} as unknown as ChessState,
@@ -14,19 +94,18 @@ const ChessStateContext = createContext<ChessState>(
 
 export const useChessState = () => useContext(ChessStateContext);
 
-export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
+export const ChessStateProvider: React.FC<PropsWithChildren> = ({
     children,
 }) => {
-    const [capturedPieces, setCapturedPieces] = useState<
-        ChessState['capturedPieces']
-    >({ black: [], white: [] });
-    const [playingSide, setPlayingSide] = useState<Side>('white');
-    const [cells, setCells] = useState(() =>
-        deserialize(
-            'cedabdecffffffff00000000000000000000000000000000FFFFFFFFCEDABDEC',
-        ),
-    );
+    const [game] = useState(() => new Chess());
 
+    const [cells, setCells] = useState(() => deriveCells(game));
+    const [capturedPieces, setCapturedPieces] = useState(() =>
+        deriveCapturedPieces(game),
+    );
+    const [playingSide, setPlayingSide] = useState<Side>(
+        () => sideMap[game.turn()],
+    );
     const [selectedCell, setSelectedCell] = useState<number>();
 
     const selectCell = useCallback(
@@ -41,67 +120,24 @@ export const ChessStateProvider: React.FC<PropsWithChildren<{}>> = ({
 
     const moveTo = useCallback(
         (index: number) => {
-            if (selectedCell) {
-                setCells((oldCells) => {
-                    const newCells = JSON.parse(
-                        JSON.stringify(oldCells),
-                    ) as typeof oldCells; // Create a deep clone so we can directly modify properties
+            if (selectedCell === undefined) return;
 
-                    const sourceCell = newCells[selectedCell];
-
-                    if (
-                        sourceCell &&
-                        sourceCell.piece &&
-                        sourceCell.side === playingSide &&
-                        sourceCell.possibleMoves &&
-                        sourceCell.possibleMoves.includes(index)
-                    ) {
-                        const targetCell = newCells[index];
-
-                        if (targetCell.side === sourceCell.side) {
-                            console.error(
-                                'Invalid move! Cannot capture same side piece!',
-                            );
-                            return oldCells;
-                        }
-
-                        if (targetCell.piece && targetCell.side) {
-                            const capturedPiece = targetCell.piece;
-                            setCapturedPieces((value) => ({
-                                ...value,
-                                [playingSide]: [
-                                    ...value[playingSide],
-                                    capturedPiece,
-                                ],
-                            }));
-                        }
-
-                        targetCell.piece = sourceCell.piece;
-                        targetCell.side = sourceCell.side;
-
-                        sourceCell.piece = undefined;
-                        sourceCell.side = undefined;
-
-                        for (let i = 0; i < newCells.length; i++) {
-                            newCells[i].possibleMoves = getPossiblePositions(
-                                newCells,
-                                i,
-                            );
-                        }
-
-                        setPlayingSide((side) =>
-                            side === 'black' ? 'white' : 'black',
-                        );
-                        setSelectedCell(undefined);
-
-                        return newCells;
-                    }
-
-                    return oldCells;
+            try {
+                game.move({
+                    from: indexToSquare(selectedCell),
+                    to: indexToSquare(index),
+                    promotion: 'q', // TODO: Let the player pick the promotion piece
                 });
+            } catch {
+                return; // Ignore illegal moves
             }
+
+            setCells(deriveCells(game));
+            setCapturedPieces(deriveCapturedPieces(game));
+            setPlayingSide(sideMap[game.turn()]);
+            setSelectedCell(undefined);
         },
-        [selectedCell, playingSide],
+        [game, selectedCell],
     );
 
     return (

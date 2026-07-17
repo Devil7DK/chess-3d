@@ -40,7 +40,7 @@ export const Board: React.FC<IBoardProps> = ({
     const whiteTexture = useTexture(WoodWhite);
 
     const onClick = (index: number) => {
-        if (!selectedCell) {
+        if (selectedCell === undefined) {
             selectCell(index);
         } else {
             if (selectedCell !== index) {
@@ -253,6 +253,7 @@ export const Board: React.FC<IBoardProps> = ({
 
                                         return (
                                             <Frame
+                                                key={`frame-${index}`}
                                                 cellSize={cellSize}
                                                 boardThickness={thickness}
                                                 position={
