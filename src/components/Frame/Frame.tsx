@@ -29,7 +29,7 @@ export const Frame = ({
 
     const geometry = useMemo(() => {
         return nodes.imagetostl_mesh0.geometry;
-    }, [nodes, color]);
+    }, [nodes]);
 
     return (
         <group

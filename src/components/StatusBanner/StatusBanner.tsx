@@ -1,6 +1,6 @@
 import { Html } from '@react-three/drei';
 
-import { useChessState } from '../../utils/ChessState';
+import { useChessState } from '../../utils/ChessStateContext';
 
 export const StatusBanner = () => {
     const { playingSide, status } = useChessState();

@@ -1,19 +1,7 @@
 import { Chess, Color, PieceSymbol } from 'chess.js';
-import React, {
-    PropsWithChildren,
-    createContext,
-    useCallback,
-    useContext,
-    useState,
-} from 'react';
-import {
-    CellState,
-    ChessPiece,
-    ChessState,
-    GameStatus,
-    Side,
-    Tuple,
-} from '../types';
+import React, { PropsWithChildren, useCallback, useState } from 'react';
+import { CellState, ChessPiece, GameStatus, Side, Tuple } from '../types';
+import { ChessStateContext } from './ChessStateContext';
 import {
     getRowColumnFromIndex,
     indexToSquare,
@@ -112,12 +100,6 @@ function deriveStatus(game: Chess): GameStatus {
 
     return 'playing';
 }
-
-const ChessStateContext = createContext<ChessState>(
-    {} as unknown as ChessState,
-);
-
-export const useChessState = () => useContext(ChessStateContext);
 
 export const ChessStateProvider: React.FC<PropsWithChildren> = ({
     children,

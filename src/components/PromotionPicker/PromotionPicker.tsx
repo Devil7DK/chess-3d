@@ -1,7 +1,7 @@
 import { Html } from '@react-three/drei';
 
 import { ChessPiece } from '../../types';
-import { useChessState } from '../../utils/ChessState';
+import { useChessState } from '../../utils/ChessStateContext';
 
 const choices: { piece: ChessPiece; label: string; symbol: string }[] = [
     { piece: 'queen', label: 'Queen', symbol: '♛' },

@@ -1,4 +1,4 @@
-export type Tuple<T, N extends number, A extends any[] = []> = A extends {
+export type Tuple<T, N extends number, A extends unknown[] = []> = A extends {
     length: N;
 }
     ? A

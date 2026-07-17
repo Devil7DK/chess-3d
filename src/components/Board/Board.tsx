@@ -7,7 +7,7 @@ import WoodBrown from '../../assets/textures/wood-brown.jpg';
 import WoodWhite from '../../assets/textures/wood-white.jpg';
 import { Point3D } from '../../types';
 import { get2DPointInGrid } from '../../utils';
-import { useChessState } from '../../utils/ChessState';
+import { useChessState } from '../../utils/ChessStateContext';
 import { Frame } from '../Frame';
 import { Piece } from '../Piece';
 import { Box, IBoxProps } from '../Shapes';
@@ -78,7 +78,15 @@ export const Board: React.FC<IBoardProps> = ({
         });
 
         return boxes;
-    }, [cells]);
+    }, [
+        cells,
+        cellSize,
+        position,
+        thickness,
+        blackTexture,
+        brownTexture,
+        whiteTexture,
+    ]);
 
     const borders = useMemo(() => {
         const border: IBoxProps[] = [];
@@ -202,7 +210,7 @@ export const Board: React.FC<IBoardProps> = ({
         });
 
         return border;
-    }, [boxes]);
+    }, [boxes, borderWidth, cellSize, thickness, brownTexture]);
 
     return (
         <>
