@@ -1,7 +1,7 @@
 import { useGLTF, useTexture } from '@react-three/drei';
-import { ThreeElements } from '@react-three/fiber';
-import React, { useMemo } from 'react';
-import { MathUtils, Mesh, MeshStandardMaterial, Vector3 } from 'three';
+import { ThreeElements, useFrame } from '@react-three/fiber';
+import React, { useMemo, useRef } from 'react';
+import { Group, MathUtils, Mesh, MeshStandardMaterial, Vector3 } from 'three';
 import { GLTF } from 'three-stdlib';
 
 import Bishop from '../../assets/models/Bishop.gltf';
@@ -59,16 +59,47 @@ export const Piece: React.FC<IPieceProps> = ({
         };
     }, [gltf]);
 
-    const position = useMemo(() => {
+    const target = useMemo(() => {
         return new Vector3(cellPosition.x, cellPosition.y, cellPosition.z);
     }, [cellPosition]);
+
+    const groupRef = useRef<Group>(null);
+    const initialized = useRef(false);
+
+    useFrame((_, delta) => {
+        const group = groupRef.current;
+        if (!group) return;
+
+        // Spawn directly at the target so pieces don't fly in from the origin
+        if (!initialized.current) {
+            group.position.copy(target);
+            initialized.current = true;
+            return;
+        }
+
+        const dx = target.x - group.position.x;
+        const dz = target.z - group.position.z;
+        const remaining = Math.sqrt(dx * dx + dz * dz);
+
+        // Lift the piece slightly while it travels; settles as it arrives
+        const lift = Math.min(remaining * 0.35, 2);
+
+        group.position.x = MathUtils.damp(group.position.x, target.x, 8, delta);
+        group.position.z = MathUtils.damp(group.position.z, target.z, 8, delta);
+        group.position.y = MathUtils.damp(
+            group.position.y,
+            target.y + lift,
+            10,
+            delta,
+        );
+    });
 
     return (
         <group
             {...props}
+            ref={groupRef}
             dispose={null}
             scale={new Vector3(0.3, 0.3, 0.3)}
-            position={position}
         >
             <mesh
                 geometry={geometry}
