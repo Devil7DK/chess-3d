@@ -14,6 +14,8 @@ export const GameControls = () => {
                 <button type='button' onClick={newGame}>
                     New Game
                 </button>
+                {/* Plain anchor: router context is not available inside the Canvas */}
+                <a href='#/'>Menu</a>
             </div>
         </Html>
     );

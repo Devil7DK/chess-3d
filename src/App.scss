@@ -59,7 +59,8 @@ div#root {
 
             pointer-events: auto;
 
-            button {
+            button,
+            a {
                 padding: 0.5rem 1rem;
                 border: none;
                 border-radius: 0.5rem;
@@ -68,10 +69,75 @@ div#root {
                 color: white;
                 font-family: sans-serif;
                 font-size: 1rem;
+                text-decoration: none;
                 cursor: pointer;
 
                 &:hover {
                     background-color: rgba(0, 0, 0, 0.75);
+                }
+            }
+        }
+    }
+
+    div.main-menu {
+        position: fixed;
+        inset: 0;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3rem;
+
+        background: radial-gradient(circle at 50% 35%, #a5825f, #6b4f3a);
+        font-family: sans-serif;
+
+        h1 {
+            margin: 0;
+
+            color: #f5e9d9;
+            font-size: 3.5rem;
+            letter-spacing: 0.25rem;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            width: min(20rem, 80vw);
+
+            button,
+            a {
+                position: relative;
+
+                padding: 1rem 1.5rem;
+                border: none;
+                border-radius: 0.75rem;
+
+                background-color: rgba(0, 0, 0, 0.45);
+                color: white;
+                font-size: 1.125rem;
+                text-align: center;
+                text-decoration: none;
+                cursor: pointer;
+
+                &:hover:not(:disabled) {
+                    background-color: rgba(0, 0, 0, 0.65);
+                }
+
+                &:disabled {
+                    color: rgba(255, 255, 255, 0.4);
+                    cursor: not-allowed;
+
+                    span {
+                        display: block;
+
+                        font-size: 0.75rem;
+                        letter-spacing: 0.05rem;
+                        text-transform: uppercase;
+                    }
                 }
             }
         }
