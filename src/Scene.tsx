@@ -1,7 +1,7 @@
 import { OrbitControls, Stage } from '@react-three/drei';
 import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { Canvas } from '@react-three/fiber';
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 
 import {
     AIPlayer,
@@ -23,6 +23,11 @@ export interface ISceneProps {
 export const Scene: React.FC<ISceneProps> = ({ ai }) => {
     const [environment, setEnvironment] = useState<PresetsType>(
         (localStorage.getItem('environment') as PresetsType) || 'sunset',
+    );
+
+    const initialSide = useMemo(
+        () => (ai ? (ai.side === 'white' ? 'black' : 'white') : 'white'),
+        [ai],
     );
 
     return (
@@ -63,8 +68,13 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
                     shadows
                     dpr={[1, 2]}
                     camera={{
-                        position: [0, 0, 150],
+                        position: [
+                            0,
+                            150,
+                            initialSide === 'white' ? -150 : 150,
+                        ],
                         fov: 40,
+                        zoom: 1,
                     }}
                 >
                     <color attach='background' args={['#8b6b55']} />
@@ -83,7 +93,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
                             <GameControls />
                         </ChessStateProvider>
                     </Stage>
-                    <OrbitControls />
+                    <OrbitControls target={[0, 0, 0]} />
                 </Canvas>
             </Suspense>
         </>
