@@ -59,6 +59,14 @@ div#root {
 
             pointer-events: auto;
 
+            @media (orientation: portrait) {
+                top: -2rem;
+                left: 50%;
+                right: auto;
+                white-space: nowrap;
+                transform: translateX(-50%);
+            }
+
             button,
             a {
                 padding: 0.5rem 1rem;
