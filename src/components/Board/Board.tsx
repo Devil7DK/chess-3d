@@ -280,6 +280,7 @@ export const Board: React.FC<IBoardProps> = ({
                         (nodes, piece, index, arr) => (
                             nodes.push(
                                 <Piece
+                                    key={`captured-${side}-${index}`}
                                     cellPosition={{
                                         x:
                                             position.x +
