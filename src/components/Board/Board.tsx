@@ -21,7 +21,6 @@ export interface IBoardProps {
 }
 
 export const Board: React.FC<IBoardProps> = ({
-    borderColor,
     borderWidth,
     cellSize,
     position,
@@ -57,7 +56,7 @@ export const Board: React.FC<IBoardProps> = ({
     };
 
     const boxes = useMemo<IBoxProps[]>(() => {
-        const boxes = cells.map<IBoxProps>((cell, index) => {
+        const boxes = cells.map<IBoxProps>((cell) => {
             const { row, column, color } = cell;
             const { x, y } = get2DPointInGrid(cellSize, position, row, column);
 

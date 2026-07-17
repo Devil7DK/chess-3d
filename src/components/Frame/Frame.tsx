@@ -1,5 +1,5 @@
 import { useGLTF } from '@react-three/drei';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { ColorRepresentation, Mesh, Vector3 } from 'three';
 import { GLTF } from 'three-stdlib';
 
@@ -25,7 +25,7 @@ export const Frame = ({
     color,
     position,
 }: IFrameProps) => {
-    const { nodes } = useGLTF(FrameModel) as GLTFResult;
+    const { nodes } = useGLTF(FrameModel) as unknown as GLTFResult;
 
     const geometry = useMemo(() => {
         return nodes.imagetostl_mesh0.geometry;

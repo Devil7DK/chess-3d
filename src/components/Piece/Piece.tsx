@@ -1,4 +1,5 @@
 import { useGLTF, useTexture } from '@react-three/drei';
+import { ThreeElements } from '@react-three/fiber';
 import React, { useMemo } from 'react';
 import { MathUtils, Mesh, MeshStandardMaterial, Vector3 } from 'three';
 import { GLTF } from 'three-stdlib';
@@ -13,7 +14,7 @@ import WoodBlack from '../../assets/textures/wood-black.jpg';
 import WoodWhite from '../../assets/textures/wood-white.jpg';
 import { ChessPiece, Point3D, Side } from '../../types';
 
-export type IPieceProps = JSX.IntrinsicElements['group'] & {
+export type IPieceProps = ThreeElements['group'] & {
     piece: ChessPiece;
     side: Side;
     cellPosition: Point3D;
@@ -47,7 +48,7 @@ export const Piece: React.FC<IPieceProps> = ({
                   : piece === 'queen'
                     ? Queen
                     : Rook,
-    ) as GLTFResult;
+    ) as unknown as GLTFResult;
 
     const texture = useTexture(side === 'black' ? WoodBlack : WoodWhite);
 
