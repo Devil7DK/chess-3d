@@ -23,7 +23,7 @@ export interface ISceneProps {
 
 export const Scene: React.FC<ISceneProps> = ({ ai }) => {
     const [environment, setEnvironment] = useState<PresetsType>(
-        (localStorage.getItem('environment') as PresetsType) || 'sunset',
+        (localStorage.getItem('environment') as PresetsType) || 'studio',
     );
 
     const initialSide = useMemo(
