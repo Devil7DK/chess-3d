@@ -15,4 +15,6 @@ export type ChessState = {
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;
     promote: (piece: ChessPiece | null) => void;
+    newGame: () => void;
+    undo: () => void;
 };

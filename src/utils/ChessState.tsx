@@ -213,6 +213,23 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
         [game, pendingPromotion, syncState],
     );
 
+    const newGame = useCallback(() => {
+        game.reset();
+        setPendingPromotion(undefined);
+        syncState();
+    }, [game, syncState]);
+
+    const undo = useCallback(() => {
+        if (pendingPromotion) {
+            setPendingPromotion(undefined);
+            setSelectedCell(undefined);
+            return; // Cancel the pending promotion instead of undoing a move
+        }
+
+        game.undo();
+        syncState();
+    }, [game, pendingPromotion, syncState]);
+
     return (
         <ChessStateContext.Provider
             value={{
@@ -225,6 +242,8 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
                 selectCell,
                 moveTo,
                 promote,
+                newGame,
+                undo,
             }}
         >
             {children}
