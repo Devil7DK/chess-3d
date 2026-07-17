@@ -1,3 +1,5 @@
+import { Square } from 'chess.js';
+
 import {
     CellPosition,
     CellState,
@@ -64,6 +66,21 @@ export function get2DPointInGrid(
     return { x, y };
 }
 // #endregion Grid
+
+// #region Notation
+export function indexToSquare(index: number): Square {
+    const { row, column } = getRowColumnFromIndex(index);
+
+    return `${String.fromCharCode(96 + column)}${row}` as Square;
+}
+
+export function squareToIndex(square: Square): number {
+    const column = square.charCodeAt(0) - 96;
+    const row = Number(square.charAt(1));
+
+    return getIndexFromRowColumn(row, column);
+}
+// #endregion Notation
 
 // #region Serialization
 const pieceSerializationMap: Record<ChessPiece, string> = {
