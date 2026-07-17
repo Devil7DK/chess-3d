@@ -1,4 +1,6 @@
 div#root {
+    --buttons-wrapper-top: 1rem;
+
     position: fixed;
     inset: 0;
 
@@ -6,6 +8,10 @@ div#root {
     flex-direction: column;
 
     background-color: #8b6b55;
+
+    @media (orientation: portrait) {
+        --buttons-wrapper-top: 4rem;
+    }
 
     div.overlay {
         position: fixed;
@@ -20,7 +26,7 @@ div#root {
 
         div.status-banner {
             position: absolute;
-            top: 1rem;
+            top: var(--buttons-wrapper-top);
             left: 50%;
             transform: translateX(-50%);
 
@@ -51,7 +57,7 @@ div#root {
 
         div.game-controls {
             position: absolute;
-            top: 1rem;
+            top: var(--buttons-wrapper-top);
             right: 1rem;
 
             display: flex;
@@ -60,7 +66,7 @@ div#root {
             pointer-events: auto;
 
             @media (orientation: portrait) {
-                top: -2rem;
+                top: calc(var(--buttons-wrapper-top) - 3rem);
                 left: 50%;
                 right: auto;
                 white-space: nowrap;
@@ -92,7 +98,7 @@ div#root {
 
         div.settings-container {
             position: absolute;
-            top: 1rem;
+            top: var(--buttons-wrapper-top);
             left: 1rem;
             z-index: 20;
 
