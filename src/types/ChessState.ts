@@ -1,3 +1,5 @@
+import { Square } from 'chess.js';
+
 import { CellState } from './CellState';
 import { ChessPiece } from './ChessPiece';
 import { GameStatus } from './GameStatus';
@@ -13,10 +15,12 @@ export type ChessState = {
     playingSide: Side;
     status: GameStatus;
     pendingPromotion?: { from: number; to: number };
+    fen: string;
 
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;
     promote: (piece: ChessPiece | null) => void;
+    applyMove: (from: Square, to: Square, promotion?: ChessPiece) => void;
     newGame: () => void;
     undo: () => void;
 };

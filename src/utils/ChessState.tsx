@@ -208,9 +208,14 @@ function deriveStatus(game: Chess): GameStatus {
     return 'playing';
 }
 
-export const ChessStateProvider: React.FC<PropsWithChildren> = ({
-    children,
-}) => {
+export const ChessStateProvider: React.FC<
+    PropsWithChildren<{
+        /**
+         * Side that cannot be moved by clicking (e.g. the AI's side).
+         */
+        lockedSide?: Side;
+    }>
+> = ({ children, lockedSide }) => {
     const [game] = useState(() => new Chess());
 
     const [cells, setCells] = useState(() => deriveCells(game));
@@ -224,6 +229,7 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
     const [status, setStatus] = useState<GameStatus>(() =>
         deriveStatus(game),
     );
+    const [fen, setFen] = useState(() => game.fen());
     const [selectedCell, setSelectedCell] = useState<number>();
     const [pendingPromotion, setPendingPromotion] = useState<{
         from: number;
@@ -236,19 +242,21 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
         setCapturedPieces(deriveCapturedPieces(game));
         setPlayingSide(sideMap[game.turn()]);
         setStatus(deriveStatus(game));
+        setFen(game.fen());
         setSelectedCell(undefined);
     }, [game]);
 
     const selectCell = useCallback(
         (index: number) => {
             if (pendingPromotion) return;
+            if (lockedSide && playingSide === lockedSide) return;
 
             const cell = cells[index];
             if (cell && cell.side === playingSide) {
                 setSelectedCell(index);
             }
         },
-        [cells, playingSide, pendingPromotion],
+        [cells, playingSide, pendingPromotion, lockedSide],
     );
 
     const moveTo = useCallback(
@@ -304,6 +312,25 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
         [game, pendingPromotion, syncState],
     );
 
+    const applyMove = useCallback(
+        (from: Square, to: Square, promotion?: ChessPiece) => {
+            try {
+                game.move({
+                    from,
+                    to,
+                    promotion: promotion
+                        ? pieceSymbolMap[promotion]
+                        : undefined,
+                });
+            } catch {
+                return; // Ignore illegal moves
+            }
+
+            syncState();
+        },
+        [game, syncState],
+    );
+
     const newGame = useCallback(() => {
         game.reset();
         setPendingPromotion(undefined);
@@ -318,8 +345,15 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
         }
 
         game.undo();
+
+        // Against the AI, take back the AI's reply as well so it's still
+        // the player's turn afterwards
+        if (lockedSide && sideMap[game.turn()] === lockedSide) {
+            game.undo();
+        }
+
         syncState();
-    }, [game, pendingPromotion, syncState]);
+    }, [game, pendingPromotion, syncState, lockedSide]);
 
     return (
         <ChessStateContext.Provider
@@ -331,9 +365,11 @@ export const ChessStateProvider: React.FC<PropsWithChildren> = ({
                 playingSide,
                 status,
                 pendingPromotion,
+                fen,
                 selectCell,
                 moveTo,
                 promote,
+                applyMove,
                 newGame,
                 undo,
             }}

@@ -1,3 +1,4 @@
+export * from './AIDifficulty';
 export * from './Box';
 export * from './CellPosition';
 export * from './CellState';

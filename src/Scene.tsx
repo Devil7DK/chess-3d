@@ -4,14 +4,23 @@ import { Canvas } from '@react-three/fiber';
 import React, { Suspense, useState } from 'react';
 
 import {
+    AIPlayer,
     Board,
     GameControls,
+    IAIPlayerProps,
     PromotionPicker,
     StatusBanner,
 } from './components';
 import { ChessStateProvider } from './utils/ChessState';
 
-export const Scene: React.FC = () => {
+export interface ISceneProps {
+    /**
+     * When set, the given side is played by the stockfish engine.
+     */
+    ai?: IAIPlayerProps;
+}
+
+export const Scene: React.FC<ISceneProps> = ({ ai }) => {
     const [environment, setEnvironment] = useState<PresetsType>(
         (localStorage.getItem('environment') as PresetsType) || 'sunset',
     );
@@ -60,7 +69,8 @@ export const Scene: React.FC = () => {
                 >
                     <color attach='background' args={['#8b6b55']} />
                     <Stage environment={environment} intensity={0.6}>
-                        <ChessStateProvider>
+                        <ChessStateProvider lockedSide={ai?.side}>
+                            {ai && <AIPlayer {...ai} />}
                             <Board
                                 borderColor='grey'
                                 borderWidth={2}
