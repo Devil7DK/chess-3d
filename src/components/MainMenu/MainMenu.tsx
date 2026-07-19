@@ -15,6 +15,7 @@ export const MainMenu = () => {
     const [remoteSide, setRemoteSide] = useState<Side | 'random'>('random');
     const [joinCode, setJoinCode] = useState('');
     const [creatingRoom, setCreatingRoom] = useState(false);
+    const [findingMatch, setFindingMatch] = useState(false);
     const [remoteError, setRemoteError] = useState<string>();
 
     const createRoom = async () => {
@@ -31,6 +32,22 @@ export const MainMenu = () => {
             console.error('Failed to create room', error);
             setRemoteError('Could not create a room, try again.');
             setCreatingRoom(false);
+        }
+    };
+
+    const findRandomOpponent = async () => {
+        setFindingMatch(true);
+        setRemoteError(undefined);
+
+        try {
+            const { findRandomMatch } = await import('../../utils/RemoteRooms');
+            const { roomId } = await findRandomMatch();
+
+            navigate(`/game/${roomId}`);
+        } catch (error) {
+            console.error('Failed to find a match', error);
+            setRemoteError('Could not find a match, try again.');
+            setFindingMatch(false);
         }
     };
 
@@ -137,6 +154,16 @@ export const MainMenu = () => {
                             onClick={() => navigate(`/game/${joinCode}`)}
                         >
                             Join Room
+                        </button>
+                        <div className='mode-options-divider'>or</div>
+                        <button
+                            type='button'
+                            disabled={findingMatch}
+                            onClick={findRandomOpponent}
+                        >
+                            {findingMatch
+                                ? 'Finding match…'
+                                : 'Random Opponent'}
                         </button>
                         {remoteError && (
                             <div className='mode-options-error'>

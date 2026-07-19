@@ -155,6 +155,95 @@ export const joinRoom = async (roomId: string): Promise<JoinRoomResult> => {
     return { error: 'full' };
 };
 
+interface MatchmakingEntry {
+    uid: string;
+    roomId: string;
+    createdAt: number;
+}
+
+const WAITING_PATH = 'matchmaking/waiting';
+
+/**
+ * Pairs with the waiting player if there is one, otherwise creates a room
+ * and advertises it in the queue. Either way resolves with the room to
+ * navigate to; the caller lands in the normal room flow (waiting modal
+ * until the opponent arrives).
+ */
+export const findRandomMatch = async (): Promise<{ roomId: string }> => {
+    const user = await ensureSignedIn();
+    const database = getFirebaseDatabase();
+    const waitingRef = ref(database, WAITING_PATH);
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const snapshot = await get(waitingRef);
+        const waiting = snapshot.val() as MatchmakingEntry | null;
+
+        // Re-clicking while already queued goes back to the waiting room
+        if (waiting?.uid === user.uid) {
+            return { roomId: waiting.roomId };
+        }
+
+        if (waiting) {
+            // Take the waiting player's open seat — the seat transaction
+            // inside joinRoom is the arbiter if several players race for it
+            const result = await joinRoom(waiting.roomId);
+
+            if ('side' in result) {
+                remove(waitingRef).catch(() => undefined);
+                return { roomId: waiting.roomId };
+            }
+
+            // Room gone or already full — clear the stale entry and retry
+            await remove(waitingRef);
+            continue;
+        }
+
+        // No one waiting: create a room and claim the queue slot. The
+        // null → entry transaction direction is safe against the SDK's
+        // empty local cache (see joinRoom).
+        const { roomId } = await createRoom('random');
+
+        const claim = await runTransaction(waitingRef, (current) =>
+            current === null
+                ? { uid: user.uid, roomId, createdAt: Date.now() }
+                : undefined,
+        );
+
+        if (!claim.committed) {
+            // Someone entered the queue first — drop our unused room and
+            // match with them on the next pass
+            await remove(ref(database, `rooms/${roomId}`));
+            continue;
+        }
+
+        // If we bail while waiting, free the slot for others
+        onDisconnect(waitingRef).remove();
+
+        // Once our game starts, stop the disconnect cleanup and clear the
+        // entry (if still ours) so a later waiter can't get clobbered
+        const unsubscribe = onValue(
+            ref(database, `rooms/${roomId}/status`),
+            (statusSnapshot) => {
+                if (statusSnapshot.val() !== 'playing') return;
+
+                unsubscribe();
+                onDisconnect(waitingRef).cancel();
+
+                get(waitingRef).then((entrySnapshot) => {
+                    const entry = entrySnapshot.val() as MatchmakingEntry | null;
+                    if (entry?.uid === user.uid && entry.roomId === roomId) {
+                        remove(waitingRef).catch(() => undefined);
+                    }
+                });
+            },
+        );
+
+        return { roomId };
+    }
+
+    throw new Error('Could not find a match');
+};
+
 export const subscribeToRoom = (
     roomId: string,
     callback: (state: RoomState | null) => void,

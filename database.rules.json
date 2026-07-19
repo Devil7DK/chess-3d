@@ -7,6 +7,12 @@
         ".read": "auth != null",
         ".write": "auth != null && (!data.exists() || !data.child('players/white').exists() || !data.child('players/black').exists() || data.child('players/white').val() === auth.uid || data.child('players/black').val() === auth.uid)"
       }
+    },
+    "matchmaking": {
+      "waiting": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
     }
   }
 }
