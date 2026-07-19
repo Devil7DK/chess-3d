@@ -3,6 +3,7 @@ import { Square } from 'chess.js';
 import { CellState } from './CellState';
 import { ChessPiece } from './ChessPiece';
 import { GameStatus } from './GameStatus';
+import { MoveRecord } from './MoveRecord';
 import { PieceState } from './PieceState';
 import { Side } from './Side';
 import { Tuple } from './Tuple';
@@ -16,6 +17,7 @@ export type ChessState = {
     status: GameStatus;
     pendingPromotion?: { from: number; to: number };
     fen: string;
+    history: MoveRecord[];
 
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;

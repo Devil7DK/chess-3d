@@ -4,6 +4,7 @@ import {
     CellState,
     ChessPiece,
     GameStatus,
+    MoveRecord,
     PieceState,
     Side,
     Tuple,
@@ -199,6 +200,14 @@ function deriveCapturedPieces(game: Chess): Record<Side, ChessPiece[]> {
     return capturedPieces;
 }
 
+function deriveHistory(game: Chess): MoveRecord[] {
+    return game.history({ verbose: true }).map((move) => ({
+        from: move.from,
+        to: move.to,
+        promotion: move.promotion ? pieceMap[move.promotion] : undefined,
+    }));
+}
+
 function deriveStatus(game: Chess): GameStatus {
     if (game.isCheckmate()) return 'checkmate';
     if (game.isStalemate()) return 'stalemate';
@@ -230,6 +239,7 @@ export const ChessStateProvider: React.FC<
         deriveStatus(game),
     );
     const [fen, setFen] = useState(() => game.fen());
+    const [history, setHistory] = useState(() => deriveHistory(game));
     const [selectedCell, setSelectedCell] = useState<number>();
     const [pendingPromotion, setPendingPromotion] = useState<{
         from: number;
@@ -243,6 +253,7 @@ export const ChessStateProvider: React.FC<
         setPlayingSide(sideMap[game.turn()]);
         setStatus(deriveStatus(game));
         setFen(game.fen());
+        setHistory(deriveHistory(game));
         setSelectedCell(undefined);
     }, [game]);
 
@@ -366,6 +377,7 @@ export const ChessStateProvider: React.FC<
                 status,
                 pendingPromotion,
                 fen,
+                history,
                 selectCell,
                 moveTo,
                 promote,
