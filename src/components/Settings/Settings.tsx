@@ -1,4 +1,3 @@
-import { Html } from '@react-three/drei';
 import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { useEffect, useRef, useState } from 'react';
 
@@ -34,7 +33,7 @@ export const Settings = ({
     }, [isOpen]);
 
     return (
-        <Html fullscreen wrapperClass='settings-wrapper'>
+        <div className='settings-wrapper'>
             <div className='settings-container' ref={panelRef}>
                 <button
                     type='button'
@@ -77,6 +76,6 @@ export const Settings = ({
                     </div>
                 )}
             </div>
-        </Html>
+        </div>
     );
 };

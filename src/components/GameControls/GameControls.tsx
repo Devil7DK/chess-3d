@@ -1,4 +1,4 @@
-import { Html } from '@react-three/drei';
+import { Link } from 'react-router-dom';
 
 import { useChessState } from '../../utils/ChessStateContext';
 
@@ -18,7 +18,7 @@ export const GameControls = ({
     const { newGame, undo } = useChessState();
 
     return (
-        <Html fullscreen wrapperClass='game-controls-wrapper'>
+        <div className='game-controls-wrapper'>
             <div className='game-controls'>
                 {showUndo && (
                     <button type='button' onClick={undo}>
@@ -30,9 +30,8 @@ export const GameControls = ({
                         New Game
                     </button>
                 )}
-                {/* Plain anchor: router context is not available inside the Canvas */}
-                <a href='#/'>Menu</a>
+                <Link to='/'>Menu</Link>
             </div>
-        </Html>
+        </div>
     );
 };

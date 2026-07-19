@@ -1,5 +1,3 @@
-import { Html } from '@react-three/drei';
-
 import { useChessState } from '../../utils/ChessStateContext';
 
 export const StatusBanner = () => {
@@ -17,7 +15,7 @@ export const StatusBanner = () => {
                   }`;
 
     return (
-        <Html fullscreen wrapperClass='status-banner-wrapper'>
+        <div className='status-banner-wrapper'>
             <div
                 className={`status-banner${
                     status !== 'playing' ? ` status-${status}` : ''
@@ -25,6 +23,6 @@ export const StatusBanner = () => {
             >
                 {message}
             </div>
-        </Html>
+        </div>
     );
 };

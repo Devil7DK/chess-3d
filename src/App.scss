@@ -21,6 +21,20 @@ div#root {
         opacity: 0.7;
     }
 
+    // Full-screen layers for the in-game UI, rendered as plain DOM outside
+    // the canvas so the camera can't move them
+    div.status-banner-wrapper,
+    div.game-controls-wrapper,
+    div.settings-wrapper,
+    div.promotion-picker-wrapper,
+    div.remote-overlay-wrapper {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+
+        pointer-events: none;
+    }
+
     div.status-banner-wrapper {
         pointer-events: none;
 

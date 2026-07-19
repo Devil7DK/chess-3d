@@ -1,5 +1,3 @@
-import { Html } from '@react-three/drei';
-
 import { ChessPiece } from '../../types';
 import { useChessState } from '../../utils/ChessStateContext';
 
@@ -16,7 +14,7 @@ export const PromotionPicker = () => {
     if (!pendingPromotion) return null;
 
     return (
-        <Html fullscreen wrapperClass='promotion-picker-wrapper'>
+        <div className='promotion-picker-wrapper'>
             <div className='promotion-picker'>
                 <span className='promotion-picker-title'>Promote pawn to</span>
                 <div className='promotion-picker-choices'>
@@ -39,6 +37,6 @@ export const PromotionPicker = () => {
                     Cancel
                 </button>
             </div>
-        </Html>
+        </div>
     );
 };

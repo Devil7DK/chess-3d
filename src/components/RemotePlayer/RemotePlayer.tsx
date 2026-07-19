@@ -1,5 +1,5 @@
-import { Html } from '@react-three/drei';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Side } from '../../types';
 import { useChessState } from '../../utils/ChessStateContext';
@@ -90,7 +90,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
     );
 
     return (
-        <Html fullscreen wrapperClass='remote-overlay-wrapper'>
+        <div className='remote-overlay-wrapper'>
             {room === null && (
                 <div className='remote-backdrop'>
                     <div className='remote-modal'>
@@ -98,8 +98,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
                             Room not found
                         </span>
                         <span>This room no longer exists.</span>
-                        {/* Plain anchor: router context is not available inside the Canvas */}
-                        <a href='#/'>Back to menu</a>
+                        <Link to='/'>Back to menu</Link>
                     </div>
                 </div>
             )}
@@ -127,6 +126,6 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
             {room?.status === 'playing' && !opponentConnected && (
                 <div className='remote-notice'>Opponent disconnected</div>
             )}
-        </Html>
+        </div>
     );
 };
