@@ -9,7 +9,7 @@ import {
     useSearchParams,
 } from 'react-router-dom';
 
-import { MainMenu } from './components';
+import { MainMenu, RemoteGame } from './components';
 import { Scene } from './Scene';
 import { AIDifficulty } from './types';
 
@@ -45,6 +45,7 @@ export const App: React.FC = () => {
                 <Route path='/' element={<MainMenu />} />
                 <Route path='/play' element={<Scene />} />
                 <Route path='/play/ai' element={<SinglePlayer />} />
+                <Route path='/game/:roomId' element={<RemoteGame />} />
                 <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
         </HashRouter>

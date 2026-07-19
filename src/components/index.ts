@@ -4,6 +4,8 @@ export * from './GameControls';
 export * from './MainMenu';
 export * from './Piece';
 export * from './PromotionPicker';
+export * from './RemoteGame';
+export * from './RemotePlayer';
 export * from './Shapes';
 export * from './StatusBanner';
 export * from './Settings';

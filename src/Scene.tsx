@@ -8,7 +8,9 @@ import {
     Board,
     GameControls,
     IAIPlayerProps,
+    IRemotePlayerProps,
     PromotionPicker,
+    RemotePlayer,
     Settings,
     StatusBanner,
 } from './components';
@@ -19,16 +21,27 @@ export interface ISceneProps {
      * When set, the given side is played by the stockfish engine.
      */
     ai?: IAIPlayerProps;
+    /**
+     * When set, the opponent's side is synced through the Firebase room.
+     */
+    remote?: IRemotePlayerProps;
 }
 
-export const Scene: React.FC<ISceneProps> = ({ ai }) => {
+export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
     const [environment, setEnvironment] = useState<PresetsType>(
         (localStorage.getItem('environment') as PresetsType) || 'studio',
     );
 
-    const initialSide = useMemo(
-        () => (ai ? (ai.side === 'white' ? 'black' : 'white') : 'white'),
-        [ai],
+    // Side played on this device — the camera starts behind it and the
+    // other side is locked from being moved by clicks
+    const playerSide = useMemo(
+        () =>
+            ai
+                ? ai.side === 'white'
+                    ? 'black'
+                    : 'white'
+                : (remote?.side ?? 'white'),
+        [ai, remote],
     );
 
     const setEnvironmentAndStore = (env: PresetsType) => {
@@ -57,7 +70,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
                         position: [
                             0,
                             150,
-                            initialSide === 'white' ? -150 : 150,
+                            playerSide === 'white' ? -150 : 150,
                         ],
                         fov: 40,
                         zoom: 1,
@@ -65,8 +78,17 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
                 >
                     <color attach='background' args={['#8b6b55']} />
                     <Stage environment={environment} intensity={0.6}>
-                        <ChessStateProvider lockedSide={ai?.side}>
+                        <ChessStateProvider
+                            lockedSide={
+                                ai || remote
+                                    ? playerSide === 'white'
+                                        ? 'black'
+                                        : 'white'
+                                    : undefined
+                            }
+                        >
                             {ai && <AIPlayer {...ai} />}
+                            {remote && <RemotePlayer {...remote} />}
                             <Board
                                 borderColor='grey'
                                 borderWidth={2}
@@ -76,7 +98,10 @@ export const Scene: React.FC<ISceneProps> = ({ ai }) => {
                             />
                             <StatusBanner />
                             <PromotionPicker />
-                            <GameControls />
+                            <GameControls
+                                showUndo={!remote}
+                                showNewGame={!remote}
+                            />
                             <Settings
                                 environment={environment}
                                 onChangeEnvironment={setEnvironmentAndStore}
