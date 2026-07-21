@@ -14,6 +14,7 @@ import {
     MoveHistory,
     PromotionPicker,
     RemotePlayer,
+    SceneEnvironment,
     Settings,
     StatusBanner,
 } from './components';
@@ -63,11 +64,10 @@ const SceneCanvas: React.FC<{
                 }}
             >
                 <color attach='background' args={['#8b6b55']} />
-                <Stage
-                    adjustCamera={false}
-                    environment={environment}
-                    intensity={0.6}
-                >
+                {/* Outside Stage, in its own Suspense boundary — a hanging
+                    HDR fetch must never hold up the board */}
+                <SceneEnvironment preset={environment} />
+                <Stage adjustCamera={false} environment={null} intensity={0.6}>
                     <ChessStateContext.Provider value={chessState}>
                         <Board
                             borderColor='grey'

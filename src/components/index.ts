@@ -12,6 +12,7 @@ export * from './PieceIcon';
 export * from './PromotionPicker';
 export * from './RemoteGame';
 export * from './RemotePlayer';
+export * from './SceneEnvironment';
 export * from './Shapes';
 export * from './StatusBanner';
 export * from './Settings';
