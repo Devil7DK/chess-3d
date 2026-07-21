@@ -251,9 +251,7 @@ export const ChessStateProvider: React.FC<
     const [playingSide, setPlayingSide] = useState<Side>(
         () => sideMap[game.turn()],
     );
-    const [status, setStatus] = useState<GameStatus>(() =>
-        deriveStatus(game),
-    );
+    const [status, setStatus] = useState<GameStatus>(() => deriveStatus(game));
     const [fen, setFen] = useState(() => game.fen());
     const [history, setHistory] = useState(() => deriveHistory(game));
     const [selectedCell, setSelectedCell] = useState<number>();

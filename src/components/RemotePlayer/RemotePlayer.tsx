@@ -21,7 +21,8 @@ export interface IRemotePlayerProps {
  * Also renders the room overlays (waiting for opponent / disconnected).
  */
 export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
-    const { fen, history, status, playingSide, applyMove } = useChessState();
+    const { fen, history, status, playingSide, applyMove, newGame } =
+        useChessState();
 
     const [service, setService] = useState<RemoteRoomsModule>();
     const [room, setRoom] = useState<RoomState | null>();
@@ -31,6 +32,11 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
     useEffect(() => {
         applyMoveRef.current = applyMove;
     }, [applyMove]);
+
+    const newGameRef = useRef(newGame);
+    useEffect(() => {
+        newGameRef.current = newGame;
+    }, [newGame]);
 
     // The firebase-heavy service is only loaded here, keeping the SDK out
     // of the main bundle
@@ -58,6 +64,40 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
         };
     }, [service, roomId]);
 
+    // A rematch starts a fresh round in the same room: wipe the local board
+    // so the sync effects below compare against the new round's move list
+    const round = room?.round;
+    const knownRoundRef = useRef(round);
+    useEffect(() => {
+        if (round === undefined) return;
+
+        if (
+            knownRoundRef.current !== undefined &&
+            knownRoundRef.current !== round
+        ) {
+            newGameRef.current();
+        }
+
+        knownRoundRef.current = round;
+    }, [round]);
+
+    // Both players have offered the next round — either may advance it, and
+    // the rules reject whoever loses the race
+    useEffect(() => {
+        if (!service || !room || room.status !== 'playing') return;
+
+        const next = room.round + 1;
+        const offers = Object.values(room.rematch);
+        const bothAgreed =
+            offers.filter((offered) => offered === next).length >= 2;
+
+        if (!bothAgreed) return;
+
+        service
+            .startNextRound(roomId, room.round)
+            .catch(() => undefined /* the opponent got there first */);
+    }, [service, room, roomId]);
+
     // Apply moves the room record has that the local game doesn't (one per
     // pass — applying updates history, which re-runs the effect for the
     // next one, so a rejoin catches up move by move)
@@ -82,7 +122,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
         const move = history[history.length - 1];
 
         service
-            .pushMove(roomId, service.moveToUci(move), side, fen)
+            .pushMove(roomId, room.round, service.moveToUci(move), side, fen)
             .catch((error) => console.error('Failed to publish move', error));
     }, [service, room, history, fen, side, roomId]);
 
@@ -109,9 +149,25 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
               : undefined;
 
     // Dismissing leaves the final position visible on the board. Keyed by
-    // the result itself so a later, different one shows up again
+    // round + result so the same result in a later game shows up again
+    const resultKey = result ? `${room?.round}:${result}` : undefined;
     const [dismissedResult, setDismissedResult] = useState<string>();
-    const showResult = Boolean(result) && dismissedResult !== result;
+    const showResult = Boolean(result) && dismissedResult !== resultKey;
+
+    const myUid = service?.getCurrentUid();
+    const nextRound = room ? room.round + 1 : 0;
+    const iOffered = Boolean(myUid && room?.rematch[myUid] === nextRound);
+    const opponentOffered = Boolean(
+        opponentUid && room?.rematch[opponentUid] === nextRound,
+    );
+
+    const offerRematch = () => {
+        if (!service || !room) return;
+
+        service
+            .offerRematch(roomId, room.round)
+            .catch((error) => console.error('Failed to offer rematch', error));
+    };
 
     return (
         <div className='remote-overlay-wrapper'>
@@ -153,9 +209,20 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
                         <span className='remote-modal-title'>Game over</span>
                         <span>{result}</span>
                         <div className='remote-modal-actions'>
+                            {iOffered ? (
+                                <span className='remote-modal-pending'>
+                                    Waiting for opponent…
+                                </span>
+                            ) : (
+                                <button type='button' onClick={offerRematch}>
+                                    {opponentOffered
+                                        ? 'Accept rematch'
+                                        : 'Rematch'}
+                                </button>
+                            )}
                             <button
                                 type='button'
-                                onClick={() => setDismissedResult(result)}
+                                onClick={() => setDismissedResult(resultKey)}
                             >
                                 View board
                             </button>
@@ -167,7 +234,17 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
             {/* The status banner keeps reporting whose turn it is (chess.js
                 knows nothing about resigning), so restate the result */}
             {room?.status === 'playing' && result && !showResult && (
-                <div className='remote-notice result'>{result}</div>
+                <div className='remote-notice result'>
+                    {result}
+                    <button
+                        type='button'
+                        onClick={() => setDismissedResult(undefined)}
+                    >
+                        {opponentOffered && !iOffered
+                            ? 'Rematch offered'
+                            : 'Rematch'}
+                    </button>
+                </div>
             )}
             {/* `!result` — leaving after the game ended is not a
                 disconnect worth warning about */}

@@ -42,6 +42,16 @@ export interface RoomState {
      * position itself is still playable.
      */
     resignedBy?: Side;
+    /**
+     * Games played in this room so far. Move entries are immutable, so a
+     * rematch cannot clear them — each round gets its own subtree instead.
+     */
+    round: number;
+    /**
+     * `uid → the round that player has offered to play`. Once both point at
+     * the next round, either client may advance `round`.
+     */
+    rematch: Record<string, number>;
 }
 
 export type JoinRoomResult = { side: Side } | { error: 'not-found' | 'full' };
@@ -295,7 +305,8 @@ export const findRandomMatch = async (): Promise<{ roomId: string }> => {
                 onDisconnect(waitingRef).cancel();
 
                 get(waitingRef).then((entrySnapshot) => {
-                    const entry = entrySnapshot.val() as MatchmakingEntry | null;
+                    const entry =
+                        entrySnapshot.val() as MatchmakingEntry | null;
                     if (entry?.uid === user.uid && entry.roomId === roomId) {
                         remove(waitingRef).catch(() => undefined);
                     }
@@ -321,10 +332,13 @@ export const subscribeToRoom = (
             return;
         }
 
+        // Rooms created before rounds existed have no `round`
+        const round: number = snapshot.child('round').val() ?? 1;
+
         // Push keys sort chronologically, and forEach walks children in key
         // order — so this is the move list in the order they were played
         const moves: string[] = [];
-        snapshot.child('moves').forEach((entry) => {
+        snapshot.child(`moves/${round}`).forEach((entry) => {
             moves.push(entry.child('uci').val());
         });
 
@@ -335,6 +349,8 @@ export const subscribeToRoom = (
             fen: snapshot.child('fen').val(),
             presence: snapshot.child('presence').val() ?? undefined,
             resignedBy: snapshot.child('resignedBy').val() ?? undefined,
+            round,
+            rematch: snapshot.child('rematch').val() ?? {},
         });
     });
 };
@@ -346,18 +362,48 @@ export const subscribeToRoom = (
  */
 export const pushMove = (
     roomId: string,
+    round: number,
     uci: string,
     side: Side,
     fen: string,
 ) => {
     const database = getFirebaseDatabase();
     const roomRef = ref(database, `rooms/${roomId}`);
-    const moveKey = push(child(roomRef, 'moves')).key;
+    const moveKey = push(child(roomRef, `moves/${round}`)).key;
 
     return update(roomRef, {
-        [`moves/${moveKey}`]: { uci, side },
+        [`moves/${round}/${moveKey}`]: { uci, side },
         fen,
         lastMoveAt: serverTimestamp(),
+    });
+};
+
+/** The uid this device plays as — the key rematch offers are stored under. */
+export const getCurrentUid = (): string | undefined =>
+    getFirebaseAuth().currentUser?.uid;
+
+/**
+ * Offers to play another game. When both players have offered the same
+ * round, either client may advance `round` — the rules only accept a `+1`,
+ * so whoever loses the race is simply rejected.
+ */
+export const offerRematch = (roomId: string, round: number) => {
+    const uid = getCurrentUid();
+    if (!uid) return Promise.resolve();
+
+    const database = getFirebaseDatabase();
+
+    return set(ref(database, `rooms/${roomId}/rematch/${uid}`), round + 1);
+};
+
+export const startNextRound = (roomId: string, round: number) => {
+    const database = getFirebaseDatabase();
+
+    return update(ref(database, `rooms/${roomId}`), {
+        round: round + 1,
+        fen: DEFAULT_POSITION,
+        resignedBy: null,
+        endedAt: null,
     });
 };
 
