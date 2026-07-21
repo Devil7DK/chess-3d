@@ -144,7 +144,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
                 showNewGame={!remote}
                 showUndo={!remote}
             />
-            <MoveHistory />
+            <MoveHistory playerSide={playerSide} />
             <Settings
                 boardMode={boardMode}
                 environment={environment}

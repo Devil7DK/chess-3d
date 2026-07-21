@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { Side } from '../../types';
 import { useChessState } from '../../utils/ChessStateContext';
+import { BoardGrid } from '../BoardGrid';
 import { PieceIcon } from '../PieceIcon';
 
 export interface IBoard2DProps {
@@ -11,8 +12,6 @@ export interface IBoard2DProps {
      */
     playerSide: Side;
 }
-
-const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 /**
  * Flat board over the same `ChessState` as the 3D one: identical click
@@ -32,36 +31,43 @@ export const Board2D = ({ playerSide }: IBoard2DProps) => {
         moveTo,
     } = useChessState();
 
-    // Board is drawn top row first; white reads ranks 8→1 with files a→h,
-    // black sees it rotated a half turn
-    const order = useMemo(() => {
-        const indices: number[] = [];
+    const highlights = useMemo(() => {
+        const classes = new Map<number, string>();
 
-        for (let step = 0; step < 8; step++) {
-            const row = playerSide === 'white' ? 8 - step : step + 1;
-
-            for (let file = 0; file < 8; file++) {
-                const column = playerSide === 'white' ? file + 1 : 8 - file;
-                indices.push((row - 1) * 8 + (column - 1));
-            }
+        // Last move only while nothing is selected, so it never competes
+        // with the move being chosen for the same square
+        if (selectedCell === undefined && lastMove) {
+            classes.set(lastMove.from, 'last-move');
+            classes.set(lastMove.to, 'last-move');
         }
-
-        return indices;
-    }, [playerSide]);
-
-    const moveTargets = useMemo(() => {
-        const targets = new Map<number, boolean>();
 
         if (selectedCell !== undefined) {
-            for (const move of cells[selectedCell].possibleMoves ?? []) {
-                targets.set(move.index, move.capture);
+            const cell = cells[selectedCell];
+
+            classes.set(
+                selectedCell,
+                cell.possibleMoves?.length ? 'selected' : 'selected-blocked',
+            );
+
+            for (const move of cell.possibleMoves ?? []) {
+                classes.set(move.index, move.capture ? 'capture' : 'move');
             }
         }
 
-        return targets;
-    }, [cells, selectedCell]);
+        if (status === 'check' || status === 'checkmate') {
+            const king = cells.find(
+                (cell) => cell.piece === 'king' && cell.side === playingSide,
+            );
 
-    const onClick = (index: number) => {
+            if (king && !classes.has(king.index)) {
+                classes.set(king.index, 'check');
+            }
+        }
+
+        return classes;
+    }, [cells, selectedCell, lastMove, status, playingSide]);
+
+    const onSelect = (index: number) => {
         if (selectedCell === undefined || selectedCell === index) {
             selectCell(index);
             return;
@@ -91,61 +97,13 @@ export const Board2D = ({ playerSide }: IBoard2DProps) => {
             {/* capturedPieces is keyed by the capturing side, so the pieces
                 a player has taken sit on that player's own side */}
             {captureRow(playerSide === 'white' ? 'black' : 'white')}
-            <div className='board-2d'>
-                {order.map((index, position) => {
-                    const cell = cells[index];
-                    const target = moveTargets.get(index);
-
-                    const isChecked =
-                        (status === 'check' || status === 'checkmate') &&
-                        cell.piece === 'king' &&
-                        cell.side === playingSide;
-
-                    const isLastMove =
-                        selectedCell === undefined &&
-                        (lastMove?.from === index || lastMove?.to === index);
-
-                    const classes = [
-                        'board-2d-cell',
-                        cell.color,
-                        selectedCell === index
-                            ? cell.possibleMoves?.length
-                                ? 'selected'
-                                : 'selected-blocked'
-                            : '',
-                        target === undefined ? '' : target ? 'capture' : 'move',
-                        isChecked ? 'check' : '',
-                        isLastMove ? 'last-move' : '',
-                    ]
-                        .filter(Boolean)
-                        .join(' ');
-
-                    return (
-                        <button
-                            type='button'
-                            key={index}
-                            className={classes}
-                            onClick={() => onClick(index)}
-                            aria-label={`${FILES[cell.column - 1]}${cell.row}`}
-                        >
-                            {position % 8 === 0 && (
-                                <span className='rank-label'>{cell.row}</span>
-                            )}
-                            {position >= 56 && (
-                                <span className='file-label'>
-                                    {FILES[cell.column - 1]}
-                                </span>
-                            )}
-                            {cell.piece && cell.side && (
-                                <PieceIcon
-                                    piece={cell.piece}
-                                    side={cell.side}
-                                />
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
+            <BoardGrid
+                showLabels
+                highlights={highlights}
+                playerSide={playerSide}
+                squares={cells}
+                onSelect={onSelect}
+            />
             {captureRow(playerSide)}
         </div>
     );

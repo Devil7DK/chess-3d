@@ -1,6 +1,8 @@
 export * from './AIPlayer';
 export * from './Board';
 export * from './Board2D';
+export * from './BoardGrid';
+export * from './BoardPreview';
 export * from './GameControls';
 export * from './GameInfo';
 export * from './MainMenu';
@@ -13,4 +15,3 @@ export * from './RemotePlayer';
 export * from './Shapes';
 export * from './StatusBanner';
 export * from './Settings';
-
