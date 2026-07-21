@@ -1,14 +1,20 @@
 import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { useEffect, useRef, useState } from 'react';
 
+import { BoardMode } from '../../types';
+
 export interface ISettingsProps {
     environment: PresetsType;
     onChangeEnvironment: (env: PresetsType) => void;
+    boardMode: BoardMode;
+    onChangeBoardMode: (mode: BoardMode) => void;
 }
 
 export const Settings = ({
     environment,
     onChangeEnvironment,
+    boardMode,
+    onChangeBoardMode,
 }: ISettingsProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -49,30 +55,48 @@ export const Settings = ({
                     <div className='settings-panel'>
                         <h3>Settings</h3>
                         <div className='setting-item'>
-                            <label htmlFor='settings-environment-select'>
-                                Environment
-                            </label>
+                            <label htmlFor='settings-board-select'>Board</label>
                             <select
-                                id='settings-environment-select'
-                                value={environment}
+                                id='settings-board-select'
+                                value={boardMode}
                                 onChange={(e) =>
-                                    onChangeEnvironment(
-                                        e.target.value as PresetsType,
+                                    onChangeBoardMode(
+                                        e.target.value as BoardMode,
                                     )
                                 }
                             >
-                                <option value='sunset'>Sunset</option>
-                                <option value='dawn'>Dawn</option>
-                                <option value='night'>Night</option>
-                                <option value='warehouse'>Warehouse</option>
-                                <option value='forest'>Forest</option>
-                                <option value='apartment'>Apartment</option>
-                                <option value='studio'>Studio</option>
-                                <option value='city'>City</option>
-                                <option value='park'>Park</option>
-                                <option value='lobby'>Lobby</option>
+                                <option value='3d'>3D</option>
+                                <option value='2d'>2D</option>
                             </select>
                         </div>
+                        {/* The environment only lights the 3D scene */}
+                        {boardMode === '3d' && (
+                            <div className='setting-item'>
+                                <label htmlFor='settings-environment-select'>
+                                    Environment
+                                </label>
+                                <select
+                                    id='settings-environment-select'
+                                    value={environment}
+                                    onChange={(e) =>
+                                        onChangeEnvironment(
+                                            e.target.value as PresetsType,
+                                        )
+                                    }
+                                >
+                                    <option value='sunset'>Sunset</option>
+                                    <option value='dawn'>Dawn</option>
+                                    <option value='night'>Night</option>
+                                    <option value='warehouse'>Warehouse</option>
+                                    <option value='forest'>Forest</option>
+                                    <option value='apartment'>Apartment</option>
+                                    <option value='studio'>Studio</option>
+                                    <option value='city'>City</option>
+                                    <option value='park'>Park</option>
+                                    <option value='lobby'>Lobby</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

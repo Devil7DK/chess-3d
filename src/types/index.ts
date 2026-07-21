@@ -1,4 +1,5 @@
 export * from './AIDifficulty';
+export * from './BoardMode';
 export * from './Box';
 export * from './CellPosition';
 export * from './CellState';

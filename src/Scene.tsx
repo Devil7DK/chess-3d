@@ -6,6 +6,7 @@ import React, { Suspense, useMemo, useState } from 'react';
 import {
     AIPlayer,
     Board,
+    Board2D,
     GameControls,
     GameInfo,
     IAIPlayerProps,
@@ -16,7 +17,7 @@ import {
     Settings,
     StatusBanner,
 } from './components';
-import { Side } from './types';
+import { BoardMode, Side } from './types';
 import { ChessStateProvider } from './utils/ChessState';
 import { ChessStateContext, useChessState } from './utils/ChessStateContext';
 
@@ -87,6 +88,9 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
     const [environment, setEnvironment] = useState<PresetsType>(
         (localStorage.getItem('environment') as PresetsType) || 'studio',
     );
+    const [boardMode, setBoardMode] = useState<BoardMode>(
+        (localStorage.getItem('boardMode') as BoardMode) || '3d',
+    );
 
     // Side played on this device — the camera starts behind it and the
     // other side is locked from being moved by clicks
@@ -105,6 +109,11 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
         localStorage.setItem('environment', env);
     };
 
+    const setBoardModeAndStore = (mode: BoardMode) => {
+        setBoardMode(mode);
+        localStorage.setItem('boardMode', mode);
+    };
+
     return (
         <ChessStateProvider
             lockedSide={
@@ -115,7 +124,16 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
                     : undefined
             }
         >
-            <SceneCanvas environment={environment} playerSide={playerSide} />
+            {/* The two boards are interchangeable views of the same
+                ChessState — only one is mounted at a time */}
+            {boardMode === '3d' ? (
+                <SceneCanvas
+                    environment={environment}
+                    playerSide={playerSide}
+                />
+            ) : (
+                <Board2D playerSide={playerSide} />
+            )}
             {ai && <AIPlayer {...ai} />}
             {remote && <RemotePlayer {...remote} />}
             <StatusBanner />
@@ -128,7 +146,9 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
             />
             <MoveHistory />
             <Settings
+                boardMode={boardMode}
                 environment={environment}
+                onChangeBoardMode={setBoardModeAndStore}
                 onChangeEnvironment={setEnvironmentAndStore}
             />
         </ChessStateProvider>
