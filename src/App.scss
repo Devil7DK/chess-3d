@@ -338,9 +338,9 @@ div#root {
             bottom: 4rem;
             left: 1rem;
             width: 14rem;
-            // Tall enough that opening a replay preview still leaves a
-            // usable stretch of the move list underneath it
-            max-height: min(72vh, 30rem);
+            // dvh, not vh: on mobile vh is the *large* viewport, so a
+            // panel sized with it runs under the browser UI
+            max-height: min(72dvh, 30rem);
 
             display: flex;
             flex-direction: column;
@@ -363,6 +363,7 @@ div#root {
 
             div.move-history-header {
                 display: flex;
+                flex-shrink: 0;
                 align-items: center;
                 justify-content: space-between;
                 gap: 1rem;
@@ -388,15 +389,20 @@ div#root {
 
             div.move-history-preview {
                 display: flex;
+                flex-shrink: 0;
                 flex-direction: column;
                 align-items: center;
                 gap: 0.4rem;
 
                 padding: 0.6rem 0.75rem 0;
 
-                // The preview is a plain miniature — no labels, no shadow
+                // The preview is a plain miniature — no labels, no shadow.
+                // Capped so it stays a thumbnail on a phone, where the
+                // panel spans the full width and a 100% board would eat
+                // the list and the controls with it
                 div.board-2d.preview {
                     width: 100%;
+                    max-width: 12rem;
                     border-width: 0.2rem;
 
                     box-shadow: none;
@@ -418,6 +424,10 @@ div#root {
             ol.move-history-list {
                 margin: 0;
                 padding: 0.5rem 0.75rem;
+
+                // Flex items refuse to shrink below their content without
+                // this, which is what pushed the list out of the panel
+                min-height: 0;
 
                 list-style: none;
                 overflow-y: auto;

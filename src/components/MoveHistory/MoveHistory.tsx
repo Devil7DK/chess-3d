@@ -118,11 +118,8 @@ export const MoveHistory = ({ playerSide }: IMoveHistoryProps) => {
                     </div>
                     {selectedPly !== undefined && (
                         <div className='move-history-preview'>
-                            <BoardPreview
-                                fen={positions[selectedPly + 1]}
-                                lastMove={previewLastMove}
-                                playerSide={playerSide}
-                            />
+                            {/* Above the board: anything below it risks
+                                being pushed off a short mobile viewport */}
                             <button
                                 type='button'
                                 className='move-history-live'
@@ -130,6 +127,11 @@ export const MoveHistory = ({ playerSide }: IMoveHistoryProps) => {
                             >
                                 Back to live game
                             </button>
+                            <BoardPreview
+                                fen={positions[selectedPly + 1]}
+                                lastMove={previewLastMove}
+                                playerSide={playerSide}
+                            />
                         </div>
                     )}
                     {rows.length ? (
