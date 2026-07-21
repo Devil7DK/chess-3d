@@ -12,6 +12,11 @@ import { Frame } from '../Frame';
 import { Piece } from '../Piece';
 import { Box, IBoxProps } from '../Shapes';
 
+/** Destination that takes a piece, as opposed to a quiet move (white). */
+const CAPTURE_COLOR = '#e2662c';
+/** The move just played — only drawn while nothing is selected. */
+const LAST_MOVE_COLOR = '#4da3ff';
+
 export interface IBoardProps {
     position: Point3D;
     thickness: number;
@@ -32,6 +37,7 @@ export const Board: React.FC<IBoardProps> = ({
         selectedCell,
         playingSide,
         status,
+        lastMove,
         selectCell,
         moveTo,
     } = useChessState();
@@ -275,35 +281,57 @@ export const Board: React.FC<IBoardProps> = ({
                                         }
                                     />
                                 )}
-                                {cell.possibleMoves &&
-                                    cell.possibleMoves.map((index) => {
-                                        const box = boxes[index];
+                                {cell.possibleMoves?.map((move) => {
+                                    const box = boxes[move.index];
 
-                                        if (!box) {
-                                            console.log(cell);
-                                            return null;
-                                        }
-
-                                        return (
-                                            <Frame
-                                                key={`frame-${index}`}
-                                                cellSize={cellSize}
-                                                boardThickness={thickness}
-                                                position={
-                                                    new Vector3(
-                                                        box.position.x,
-                                                        box.position.y + 0.5,
-                                                        box.position.z,
-                                                    )
-                                                }
-                                            />
-                                        );
-                                    })}
+                                    return (
+                                        <Frame
+                                            key={`frame-${move.index}`}
+                                            color={
+                                                move.capture
+                                                    ? CAPTURE_COLOR
+                                                    : undefined
+                                            }
+                                            cellSize={cellSize}
+                                            boardThickness={thickness}
+                                            position={
+                                                new Vector3(
+                                                    box.position.x,
+                                                    box.position.y + 0.5,
+                                                    box.position.z,
+                                                )
+                                            }
+                                        />
+                                    );
+                                })}
                             </>
                         )}
                     </React.Fragment>
                 );
             })}
+            {/* Hidden while a piece is selected, so the move frames being
+                chosen from are never competing with it for the same cell */}
+            {selectedCell === undefined &&
+                lastMove &&
+                [lastMove.from, lastMove.to].map((index) => {
+                    const box = boxes[index];
+
+                    return (
+                        <Frame
+                            key={`last-move-${index}`}
+                            color={LAST_MOVE_COLOR}
+                            cellSize={cellSize}
+                            boardThickness={thickness}
+                            position={
+                                new Vector3(
+                                    box.position.x,
+                                    box.position.y + 0.5,
+                                    box.position.z,
+                                )
+                            }
+                        />
+                    );
+                })}
             {borders.map((props, index) => (
                 <Box key={`cell-${index}`} {...props} />
             ))}

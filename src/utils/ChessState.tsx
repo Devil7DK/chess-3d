@@ -1,11 +1,17 @@
 import { Chess, Color, PieceSymbol, Square } from 'chess.js';
-import React, { PropsWithChildren, useCallback, useState } from 'react';
+import React, {
+    PropsWithChildren,
+    useCallback,
+    useMemo,
+    useState,
+} from 'react';
 import {
     CellState,
     ChessPiece,
     GameStatus,
     MoveRecord,
     PieceState,
+    PossibleMove,
     Side,
     Tuple,
 } from '../types';
@@ -58,16 +64,25 @@ function deriveCells(game: Chess): Tuple<CellState, 64> {
 
         const entry = board[8 - row][column - 1];
 
+        // Several moves can share a destination (a promotion offers one per
+        // piece type), so collapse them — capturing if any of them captures
         const possibleMoves = entry
             ? [
-                  ...new Set(
-                      game
-                          .moves({
-                              square: indexToSquare(index),
-                              verbose: true,
-                          })
-                          .map((move) => squareToIndex(move.to)),
-                  ),
+                  ...game
+                      .moves({ square: indexToSquare(index), verbose: true })
+                      .reduce((moves, move) => {
+                          const to = squareToIndex(move.to);
+
+                          moves.set(to, {
+                              index: to,
+                              capture:
+                                  Boolean(move.captured) ||
+                                  Boolean(moves.get(to)?.capture),
+                          });
+
+                          return moves;
+                      }, new Map<number, PossibleMove>())
+                      .values(),
               ]
             : undefined;
 
@@ -246,6 +261,17 @@ export const ChessStateProvider: React.FC<
         to: number;
     }>();
 
+    const lastMove = useMemo(() => {
+        const move = history[history.length - 1];
+
+        return move
+            ? {
+                  from: squareToIndex(move.from),
+                  to: squareToIndex(move.to),
+              }
+            : undefined;
+    }, [history]);
+
     const syncState = useCallback(() => {
         setCells(deriveCells(game));
         setPieces(derivePieces(game));
@@ -378,6 +404,7 @@ export const ChessStateProvider: React.FC<
                 pendingPromotion,
                 fen,
                 history,
+                lastMove,
                 selectCell,
                 moveTo,
                 promote,

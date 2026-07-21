@@ -18,6 +18,10 @@ export type ChessState = {
     pendingPromotion?: { from: number; to: number };
     fen: string;
     history: MoveRecord[];
+    /**
+     * Cell indices of the move just played, for highlighting it.
+     */
+    lastMove?: { from: number; to: number };
 
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;
