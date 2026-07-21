@@ -1,11 +1,13 @@
 import { DEFAULT_POSITION, Square } from 'chess.js';
 import {
+    child,
     endAt,
     get,
     limitToFirst,
     onDisconnect,
     onValue,
     orderByChild,
+    push,
     query,
     ref,
     remove,
@@ -29,7 +31,8 @@ export interface RoomState {
     players: Partial<Record<Side, string>>;
     /**
      * Moves since the start position in long algebraic notation
-     * (e.g. `e2e4`, `e7e8q`) — the authoritative game record.
+     * (e.g. `e2e4`, `e7e8q`) — the authoritative game record. Stored as an
+     * append-only push-list and flattened here in key order.
      */
     moves: string[];
     fen: string;
@@ -313,30 +316,46 @@ export const subscribeToRoom = (
     const database = getFirebaseDatabase();
 
     return onValue(ref(database, `rooms/${roomId}`), (snapshot) => {
-        const value = snapshot.val();
-
-        if (!value) {
+        if (!snapshot.exists()) {
             callback(null);
             return;
         }
 
+        // Push keys sort chronologically, and forEach walks children in key
+        // order — so this is the move list in the order they were played
+        const moves: string[] = [];
+        snapshot.child('moves').forEach((entry) => {
+            moves.push(entry.child('uci').val());
+        });
+
         callback({
-            status: value.status,
-            players: value.players ?? {},
-            // Realtime Database drops empty arrays entirely
-            moves: value.moves ?? [],
-            fen: value.fen,
-            presence: value.presence,
-            resignedBy: value.resignedBy ?? undefined,
+            status: snapshot.child('status').val(),
+            players: snapshot.child('players').val() ?? {},
+            moves,
+            fen: snapshot.child('fen').val(),
+            presence: snapshot.child('presence').val() ?? undefined,
+            resignedBy: snapshot.child('resignedBy').val() ?? undefined,
         });
     });
 };
 
-export const pushMoves = (roomId: string, moves: string[], fen: string) => {
+/**
+ * Appends a single move. Entries are write-once and tagged with the side
+ * that played them, so neither player can rewrite the record or slip in a
+ * move on the other's behalf — the rules reject both.
+ */
+export const pushMove = (
+    roomId: string,
+    uci: string,
+    side: Side,
+    fen: string,
+) => {
     const database = getFirebaseDatabase();
+    const roomRef = ref(database, `rooms/${roomId}`);
+    const moveKey = push(child(roomRef, 'moves')).key;
 
-    return update(ref(database, `rooms/${roomId}`), {
-        moves,
+    return update(roomRef, {
+        [`moves/${moveKey}`]: { uci, side },
         fen,
         lastMoveAt: serverTimestamp(),
     });

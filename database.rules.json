@@ -35,9 +35,18 @@
           ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
         },
         "moves": {
-          ".write": "auth != null && (data.parent().child('players/white').val() === auth.uid || data.parent().child('players/black').val() === auth.uid)",
-          "$index": {
-            ".validate": "newData.isString() && newData.val().length >= 4 && newData.val().length <= 5 && (!data.exists() || data.val() === newData.val())"
+          "$moveId": {
+            ".write": "auth != null && !data.exists() && newData.exists() && (data.parent().parent().child('players/white').val() === auth.uid || data.parent().parent().child('players/black').val() === auth.uid)",
+            ".validate": "newData.hasChildren(['uci', 'side']) && data.parent().parent().child('players/' + newData.child('side').val()).val() === auth.uid",
+            "uci": {
+              ".validate": "newData.isString() && newData.val().length >= 4 && newData.val().length <= 5"
+            },
+            "side": {
+              ".validate": "newData.val() === 'white' || newData.val() === 'black'"
+            },
+            "$other": {
+              ".validate": false
+            }
           }
         },
         "resignedBy": {

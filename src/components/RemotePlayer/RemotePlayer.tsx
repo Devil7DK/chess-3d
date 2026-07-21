@@ -79,8 +79,10 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
         const lastMover: Side = history.length % 2 === 1 ? 'white' : 'black';
         if (lastMover !== side) return;
 
+        const move = history[history.length - 1];
+
         service
-            .pushMoves(roomId, history.map(service.moveToUci), fen)
+            .pushMove(roomId, service.moveToUci(move), side, fen)
             .catch((error) => console.error('Failed to publish move', error));
     }, [service, room, history, fen, side, roomId]);
 
