@@ -54,13 +54,17 @@ const SceneCanvas: React.FC<{
                 shadows
                 dpr={[1, 2]}
                 camera={{
-                    position: [0, 150, playerSide === 'white' ? -150 : 150],
+                    position: [0, 70, playerSide === 'white' ? -70 : 70],
                     fov: 40,
                     zoom: 1,
                 }}
             >
                 <color attach='background' args={['#8b6b55']} />
-                <Stage environment={environment} intensity={0.6}>
+                <Stage
+                    adjustCamera={false}
+                    environment={environment}
+                    intensity={0.6}
+                >
                     <ChessStateContext.Provider value={chessState}>
                         <Board
                             borderColor='grey'
@@ -71,8 +75,6 @@ const SceneCanvas: React.FC<{
                         />
                     </ChessStateContext.Provider>
                 </Stage>
-                {/* makeDefault lets Stage's camera fit cooperate with the
-                    controls instead of fighting over the camera */}
                 <OrbitControls makeDefault target={[0, 0, 0]} />
             </Canvas>
         </Suspense>
