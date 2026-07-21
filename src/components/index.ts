@@ -1,6 +1,7 @@
 export * from './AIPlayer';
 export * from './Board';
 export * from './GameControls';
+export * from './GameInfo';
 export * from './MainMenu';
 export * from './MoveHistory';
 export * from './Piece';

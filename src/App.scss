@@ -24,6 +24,7 @@ div#root {
     // Full-screen layers for the in-game UI, rendered as plain DOM outside
     // the canvas so the camera can't move them
     div.status-banner-wrapper,
+    div.game-info-wrapper,
     div.game-controls-wrapper,
     div.settings-wrapper,
     div.promotion-picker-wrapper,
@@ -110,6 +111,53 @@ div#root {
 
                     &:hover {
                         background-color: rgba(155, 34, 38, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    div.game-info-wrapper {
+        div.game-info {
+            // Sits directly under the status banner, which is the one place
+            // the eye already goes for game state
+            position: absolute;
+            top: calc(var(--buttons-wrapper-top) + 3rem);
+            left: 50%;
+            transform: translateX(-50%);
+
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+
+            padding: 0.3rem 1rem;
+            border-radius: 0.5rem;
+
+            background-color: rgba(0, 0, 0, 0.35);
+            color: white;
+            font-family: sans-serif;
+            font-size: 0.85rem;
+            white-space: nowrap;
+
+            span.game-info-side {
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+
+                text-transform: capitalize;
+
+                span.side-dot {
+                    width: 0.7rem;
+                    height: 0.7rem;
+                    border-radius: 50%;
+                    border: 1px solid rgba(255, 255, 255, 0.6);
+
+                    &.white {
+                        background-color: #f2e3cd;
+                    }
+
+                    &.black {
+                        background-color: #241a12;
                     }
                 }
             }
