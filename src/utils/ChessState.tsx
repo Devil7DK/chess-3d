@@ -220,6 +220,7 @@ function deriveHistory(game: Chess): MoveRecord[] {
         from: move.from,
         to: move.to,
         promotion: move.promotion ? pieceMap[move.promotion] : undefined,
+        san: move.san,
     }));
 }
 

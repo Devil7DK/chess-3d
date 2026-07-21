@@ -9,6 +9,7 @@ import {
     GameControls,
     IAIPlayerProps,
     IRemotePlayerProps,
+    MoveHistory,
     PromotionPicker,
     RemotePlayer,
     Settings,
@@ -123,6 +124,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
                 showNewGame={!remote}
                 showUndo={!remote}
             />
+            <MoveHistory />
             <Settings
                 environment={environment}
                 onChangeEnvironment={setEnvironmentAndStore}

@@ -27,6 +27,7 @@ div#root {
     div.game-controls-wrapper,
     div.settings-wrapper,
     div.promotion-picker-wrapper,
+    div.move-history-wrapper,
     div.remote-overlay-wrapper {
         position: fixed;
         inset: 0;
@@ -111,6 +112,112 @@ div#root {
                         background-color: rgba(155, 34, 38, 1);
                     }
                 }
+            }
+        }
+    }
+
+    div.move-history-wrapper {
+        // Bottom-left keeps clear of the top control cluster, which the
+        // portrait layout already crowds
+        button.move-history-toggle {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+
+            pointer-events: auto;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.75);
+            }
+        }
+
+        div.move-history-panel {
+            position: absolute;
+            bottom: 4rem;
+            left: 1rem;
+            width: 14rem;
+            max-height: min(50vh, 20rem);
+
+            display: flex;
+            flex-direction: column;
+
+            border-radius: 0.5rem;
+            overflow: hidden;
+
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-family: sans-serif;
+
+            pointer-events: auto;
+
+            // Full width sheet on a phone, where 14rem beside the board
+            // would be both cramped and in the way
+            @media (orientation: portrait) {
+                right: 1rem;
+                width: auto;
+            }
+
+            div.move-history-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+
+                padding: 0.5rem 0.75rem;
+
+                background-color: rgba(255, 255, 255, 0.1);
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1rem;
+
+                button {
+                    padding: 0;
+                    border: none;
+
+                    background: none;
+                    color: white;
+                    font-size: 1rem;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+            }
+
+            ol.move-history-list {
+                margin: 0;
+                padding: 0.5rem 0.75rem;
+
+                list-style: none;
+                overflow-y: auto;
+
+                li {
+                    display: grid;
+                    grid-template-columns: 2.5rem 1fr 1fr;
+                    gap: 0.5rem;
+
+                    padding: 0.15rem 0;
+                    font-family: monospace;
+                    font-size: 0.95rem;
+
+                    span.move-number {
+                        opacity: 0.6;
+                    }
+                }
+            }
+
+            span.move-history-empty {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                opacity: 0.7;
             }
         }
     }

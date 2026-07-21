@@ -66,10 +66,12 @@ const promotionSymbolMap: Partial<Record<ChessPiece, string>> = {
     knight: 'n',
 };
 
-export const moveToUci = (move: MoveRecord): string =>
+export const moveToUci = (move: Omit<MoveRecord, 'san'>): string =>
     `${move.from}${move.to}${move.promotion ? promotionSymbolMap[move.promotion] : ''}`;
 
-export const uciToMove = (uci: string): MoveRecord => ({
+// The room record stores long algebraic moves, which carry no SAN — the
+// caller only needs the squares to replay the move through chess.js
+export const uciToMove = (uci: string): Omit<MoveRecord, 'san'> => ({
     from: uci.slice(0, 2) as Square,
     to: uci.slice(2, 4) as Square,
     promotion: promotionMap[uci.charAt(4)],
