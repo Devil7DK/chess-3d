@@ -21,7 +21,7 @@ export interface IRemotePlayerProps {
  * Also renders the room overlays (waiting for opponent / disconnected).
  */
 export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
-    const { fen, history, applyMove } = useChessState();
+    const { fen, history, status, playingSide, applyMove } = useChessState();
 
     const [service, setService] = useState<RemoteRoomsModule>();
     const [room, setRoom] = useState<RoomState | null>();
@@ -89,6 +89,28 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
         opponentUid && room?.presence?.[opponentUid],
     );
 
+    // A resignation ends the game even though the position is still
+    // playable, so the room record is the authority alongside chess.js
+    const resignedBy = room?.resignedBy;
+    const result = resignedBy
+        ? resignedBy === side
+            ? 'You resigned.'
+            : 'Opponent resigned — you win!'
+        : status === 'checkmate'
+          ? playingSide === side
+              ? 'Checkmate — you lose.'
+              : 'Checkmate — you win!'
+          : status === 'stalemate'
+            ? 'Stalemate — the game is a draw.'
+            : status === 'draw'
+              ? 'The game is a draw.'
+              : undefined;
+
+    // Dismissing leaves the final position visible on the board. Keyed by
+    // the result itself so a later, different one shows up again
+    const [dismissedResult, setDismissedResult] = useState<string>();
+    const showResult = Boolean(result) && dismissedResult !== result;
+
     return (
         <div className='remote-overlay-wrapper'>
             {room === null && (
@@ -123,7 +145,31 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
                     </div>
                 </div>
             )}
-            {room?.status === 'playing' && !opponentConnected && (
+            {room?.status === 'playing' && showResult && (
+                <div className='remote-backdrop'>
+                    <div className='remote-modal'>
+                        <span className='remote-modal-title'>Game over</span>
+                        <span>{result}</span>
+                        <div className='remote-modal-actions'>
+                            <button
+                                type='button'
+                                onClick={() => setDismissedResult(result)}
+                            >
+                                View board
+                            </button>
+                            <Link to='/'>Back to menu</Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* The status banner keeps reporting whose turn it is (chess.js
+                knows nothing about resigning), so restate the result */}
+            {room?.status === 'playing' && result && !showResult && (
+                <div className='remote-notice result'>{result}</div>
+            )}
+            {/* `!result` — leaving after the game ended is not a
+                disconnect worth warning about */}
+            {room?.status === 'playing' && !result && !opponentConnected && (
                 <div className='remote-notice'>Opponent disconnected</div>
             )}
         </div>

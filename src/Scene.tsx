@@ -118,7 +118,11 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
             {remote && <RemotePlayer {...remote} />}
             <StatusBanner />
             <PromotionPicker />
-            <GameControls showUndo={!remote} showNewGame={!remote} />
+            <GameControls
+                remote={remote}
+                showNewGame={!remote}
+                showUndo={!remote}
+            />
             <Settings
                 environment={environment}
                 onChangeEnvironment={setEnvironmentAndStore}

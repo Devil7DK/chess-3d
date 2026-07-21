@@ -30,6 +30,11 @@ export interface RoomState {
     moves: string[];
     fen: string;
     presence?: Record<string, boolean>;
+    /**
+     * Set when a player gave up — the game is over even though the
+     * position itself is still playable.
+     */
+    resignedBy?: Side;
 }
 
 export type JoinRoomResult = { side: Side } | { error: 'not-found' | 'full' };
@@ -265,6 +270,7 @@ export const subscribeToRoom = (
             moves: value.moves ?? [],
             fen: value.fen,
             presence: value.presence,
+            resignedBy: value.resignedBy ?? undefined,
         });
     });
 };
@@ -276,6 +282,19 @@ export const pushMoves = (roomId: string, moves: string[], fen: string) => {
         moves,
         fen,
         lastMoveAt: serverTimestamp(),
+    });
+};
+
+/**
+ * Gives the game up on behalf of `side`. The move record is left alone so
+ * the final position stays on the board for both players.
+ */
+export const resignGame = (roomId: string, side: Side) => {
+    const database = getFirebaseDatabase();
+
+    return update(ref(database, `rooms/${roomId}`), {
+        resignedBy: side,
+        endedAt: serverTimestamp(),
     });
 };
 
