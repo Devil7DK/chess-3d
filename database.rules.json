@@ -3,15 +3,75 @@
     ".read": false,
     ".write": false,
     "rooms": {
+      ".read": "auth != null",
+      ".indexOn": ["createdAt"],
       "$roomId": {
         ".read": "auth != null",
-        ".write": "auth != null && (!data.exists() || !data.child('players/white').exists() || !data.child('players/black').exists() || data.child('players/white').val() === auth.uid || data.child('players/black').val() === auth.uid)"
+        ".write": "auth != null && ((!data.exists() && newData.exists() && (newData.child('players/white').val() === auth.uid || newData.child('players/black').val() === auth.uid)) || (data.exists() && !newData.exists() && (data.child('players/white').val() === auth.uid || data.child('players/black').val() === auth.uid || !data.child('createdAt').isNumber() || data.child('createdAt').val() < now - 86400000)))",
+        ".validate": "newData.hasChildren(['createdAt', 'status', 'players', 'fen'])",
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "endedAt": {
+          ".write": "auth != null && (data.parent().child('players/white').val() === auth.uid || data.parent().child('players/black').val() === auth.uid)",
+          ".validate": "newData.isNumber()"
+        },
+        "lastMoveAt": {
+          ".write": "auth != null && (data.parent().child('players/white').val() === auth.uid || data.parent().child('players/black').val() === auth.uid)",
+          ".validate": "newData.isNumber()"
+        },
+        "status": {
+          ".write": "auth != null && (data.parent().child('players/white').val() === auth.uid || data.parent().child('players/black').val() === auth.uid)",
+          ".validate": "newData.val() === 'waiting' || newData.val() === 'playing'"
+        },
+        "players": {
+          "$side": {
+            ".write": "auth != null && !data.exists() && newData.val() === auth.uid",
+            ".validate": "($side === 'white' || $side === 'black') && newData.isString()"
+          }
+        },
+        "fen": {
+          ".write": "auth != null && (data.parent().child('players/white').val() === auth.uid || data.parent().child('players/black').val() === auth.uid)",
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+        "moves": {
+          ".write": "auth != null && (data.parent().child('players/white').val() === auth.uid || data.parent().child('players/black').val() === auth.uid)",
+          "$index": {
+            ".validate": "newData.isString() && newData.val().length >= 4 && newData.val().length <= 5 && (!data.exists() || data.val() === newData.val())"
+          }
+        },
+        "resignedBy": {
+          ".write": "auth != null && data.parent().child('players/' + newData.val()).val() === auth.uid",
+          ".validate": "newData.val() === 'white' || newData.val() === 'black'"
+        },
+        "presence": {
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "newData.isBoolean()"
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
       }
     },
     "matchmaking": {
       "waiting": {
         ".read": "auth != null",
-        ".write": "auth != null"
+        ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || (data.exists() && !newData.exists()))",
+        ".validate": "newData.hasChildren(['uid', 'roomId', 'createdAt'])",
+        "uid": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "roomId": {
+          ".validate": "newData.isString() && newData.val().length === 6"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
       }
     }
   }

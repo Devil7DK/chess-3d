@@ -1,8 +1,12 @@
 import { DEFAULT_POSITION, Square } from 'chess.js';
 import {
+    endAt,
     get,
+    limitToFirst,
     onDisconnect,
     onValue,
+    orderByChild,
+    query,
     ref,
     remove,
     runTransaction,
@@ -77,11 +81,50 @@ export const uciToMove = (uci: string): Omit<MoveRecord, 'san'> => ({
     promotion: promotionMap[uci.charAt(4)],
 });
 
+/** Nothing expires on its own, so clients tidy up after each other. */
+const ROOM_TTL_MS = 24 * 60 * 60 * 1000;
+const SWEEP_LIMIT = 20;
+
+/**
+ * Deletes a batch of long-abandoned rooms. Best effort by design: the
+ * security rules only allow deleting rooms past the same TTL, so a failure
+ * here is never worth interrupting the caller for.
+ */
+export const sweepStaleRooms = async (): Promise<number> => {
+    const database = getFirebaseDatabase();
+
+    const stale = await get(
+        query(
+            ref(database, 'rooms'),
+            orderByChild('createdAt'),
+            endAt(Date.now() - ROOM_TTL_MS),
+            limitToFirst(SWEEP_LIMIT),
+        ),
+    );
+
+    const deletions: Promise<unknown>[] = [];
+
+    stale.forEach((room) => {
+        // Someone is still connected — leave it to their disconnect
+        if (room.hasChild('presence')) return;
+
+        deletions.push(remove(room.ref).catch(() => undefined));
+    });
+
+    await Promise.all(deletions);
+
+    return deletions.length;
+};
+
 export const createRoom = async (
     preferredSide: Side | 'random',
 ): Promise<{ roomId: string; side: Side }> => {
     const user = await ensureSignedIn();
     const database = getFirebaseDatabase();
+
+    // Creating a room is the natural moment to take out the rubbish, and
+    // the caller must not wait for it
+    sweepStaleRooms().catch(() => undefined);
 
     const side =
         preferredSide === 'random'
@@ -171,6 +214,12 @@ interface MatchmakingEntry {
 const WAITING_PATH = 'matchmaking/waiting';
 
 /**
+ * A queue entry outlives its owner whenever `onDisconnect` doesn't fire
+ * (killed tab, lost network). Past this age, assume nobody is waiting.
+ */
+const QUEUE_TTL_MS = 10 * 60 * 1000;
+
+/**
  * Pairs with the waiting player if there is one, otherwise creates a room
  * and advertises it in the queue. Either way resolves with the room to
  * navigate to; the caller lands in the normal room flow (waiting modal
@@ -188,6 +237,12 @@ export const findRandomMatch = async (): Promise<{ roomId: string }> => {
         // Re-clicking while already queued goes back to the waiting room
         if (waiting?.uid === user.uid) {
             return { roomId: waiting.roomId };
+        }
+
+        if (waiting && waiting.createdAt < Date.now() - QUEUE_TTL_MS) {
+            // Abandoned entry: clear it and take the slot ourselves
+            await remove(waitingRef);
+            continue;
         }
 
         if (waiting) {
