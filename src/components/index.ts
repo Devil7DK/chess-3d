@@ -6,6 +6,7 @@ export * from './BoardPreview';
 export * from './GameClock';
 export * from './GameControls';
 export * from './GameInfo';
+export * from './GameSounds';
 export * from './MainMenu';
 export * from './MoveHistory';
 export * from './Piece';

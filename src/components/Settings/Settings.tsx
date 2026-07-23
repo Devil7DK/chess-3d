@@ -2,6 +2,7 @@ import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { useEffect, useRef, useState } from 'react';
 
 import { BoardMode } from '../../types';
+import { isSoundMuted, setSoundMuted } from '../../utils/sounds';
 
 export interface ISettingsProps {
     environment: PresetsType;
@@ -17,7 +18,14 @@ export const Settings = ({
     onChangeBoardMode,
 }: ISettingsProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [soundOn, setSoundOn] = useState(() => !isSoundMuted());
     const panelRef = useRef<HTMLDivElement>(null);
+
+    const toggleSound = () => {
+        const next = !soundOn;
+        setSoundOn(next);
+        setSoundMuted(!next);
+    };
 
     // Close settings panel when clicking outside of it
     useEffect(() => {
@@ -54,6 +62,15 @@ export const Settings = ({
                 {isOpen && (
                     <div className='settings-panel'>
                         <h3>Settings</h3>
+                        <div className='setting-item'>
+                            <label htmlFor='settings-sound-toggle'>Sound</label>
+                            <input
+                                id='settings-sound-toggle'
+                                type='checkbox'
+                                checked={soundOn}
+                                onChange={toggleSound}
+                            />
+                        </div>
                         <div className='setting-item'>
                             <label htmlFor='settings-board-select'>Board</label>
                             <select

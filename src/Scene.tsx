@@ -10,6 +10,7 @@ import {
     GameClock,
     GameControls,
     GameInfo,
+    GameSounds,
     IAIPlayerProps,
     IRemotePlayerProps,
     MoveHistory,
@@ -137,6 +138,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
             )}
             {ai && <AIPlayer {...ai} />}
             {remote && <RemotePlayer {...remote} />}
+            <GameSounds />
             <StatusBanner />
             <GameInfo ai={ai} remote={remote} playerSide={playerSide} />
             <GameClock />
