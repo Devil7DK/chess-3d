@@ -7,6 +7,7 @@ import {
     AIPlayer,
     Board,
     Board2D,
+    GameClock,
     GameControls,
     GameInfo,
     IAIPlayerProps,
@@ -138,6 +139,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
             {remote && <RemotePlayer {...remote} />}
             <StatusBanner />
             <GameInfo ai={ai} remote={remote} playerSide={playerSide} />
+            <GameClock />
             <PromotionPicker />
             <GameControls
                 remote={remote}

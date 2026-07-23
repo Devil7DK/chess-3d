@@ -2,7 +2,7 @@ import { Chess, DEFAULT_POSITION } from 'chess.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Side } from '../../types';
-import { squareToIndex } from '../../utils';
+import { formatDuration, squareToIndex } from '../../utils';
 import { useChessState } from '../../utils/ChessStateContext';
 import { BoardPreview } from '../BoardPreview';
 import { MoveSan } from './MoveSan';
@@ -18,7 +18,7 @@ export interface IMoveHistoryProps {
  * Selecting a move replays the position it produced.
  */
 export const MoveHistory = ({ playerSide }: IMoveHistoryProps) => {
-    const { history } = useChessState();
+    const { history, moveTimes } = useChessState();
 
     const [open, setOpen] = useState(false);
     const listRef = useRef<HTMLOListElement>(null);
@@ -88,6 +88,8 @@ export const MoveHistory = ({ playerSide }: IMoveHistoryProps) => {
     const moveButton = (entry?: { ply: number; move: { san: string } }) => {
         if (!entry) return <span className='move' />;
 
+        const time = moveTimes[entry.ply];
+
         return (
             <button
                 type='button'
@@ -98,6 +100,9 @@ export const MoveHistory = ({ playerSide }: IMoveHistoryProps) => {
                     san={entry.move.san}
                     side={entry.ply % 2 === 0 ? 'white' : 'black'}
                 />
+                {time !== undefined && (
+                    <span className='move-time'>{formatDuration(time)}</span>
+                )}
             </button>
         );
     };

@@ -22,6 +22,15 @@ export type ChessState = {
      * Cell indices of the move just played, for highlighting it.
      */
     lastMove?: { from: number; to: number };
+    /**
+     * Think time in ms for each ply, indexed to match `history`.
+     */
+    moveTimes: number[];
+    /**
+     * `performance.now()` timestamp of when the side to move started their
+     * turn — consumers derive the running side's live time from it.
+     */
+    turnStartedAt: number;
 
     selectCell: (index: number) => void;
     moveTo: (index: number) => void;

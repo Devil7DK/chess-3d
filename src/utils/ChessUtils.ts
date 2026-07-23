@@ -74,3 +74,22 @@ export function squareToIndex(square: Square): number {
     return getIndexFromRowColumn(row, column);
 }
 // #endregion Notation
+
+// #region Time
+/**
+ * Formats a millisecond duration as a clock reading — `m:ss`, growing to
+ * `h:mm:ss` past an hour.
+ */
+export function formatDuration(ms: number): string {
+    const totalSeconds = Math.floor(Math.max(0, ms) / 1000);
+    const seconds = totalSeconds % 60;
+    const minutes = Math.floor(totalSeconds / 60) % 60;
+    const hours = Math.floor(totalSeconds / 3600);
+
+    const pad = (value: number) => String(value).padStart(2, '0');
+
+    return hours > 0
+        ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+        : `${minutes}:${pad(seconds)}`;
+}
+// #endregion Time

@@ -3,6 +3,7 @@ import React, {
     PropsWithChildren,
     useCallback,
     useMemo,
+    useRef,
     useState,
 } from 'react';
 import {
@@ -254,6 +255,17 @@ export const ChessStateProvider: React.FC<
     const [status, setStatus] = useState<GameStatus>(() => deriveStatus(game));
     const [fen, setFen] = useState(() => game.fen());
     const [history, setHistory] = useState(() => deriveHistory(game));
+
+    // Wall-clock timing. Every ply's think time is recorded as it happens;
+    // the running side's live time is derived from turnStartedAt by consumers.
+    // Purely observational — no time control, so it never affects the game.
+    const [moveTimes, setMoveTimes] = useState<number[]>([]);
+    const [turnStartedAt, setTurnStartedAt] = useState(() =>
+        performance.now(),
+    );
+    const turnStartRef = useRef(turnStartedAt);
+    const plyCountRef = useRef(0);
+
     const [selectedCell, setSelectedCell] = useState<number>();
     const [pendingPromotion, setPendingPromotion] = useState<{
         from: number;
@@ -280,6 +292,31 @@ export const ChessStateProvider: React.FC<
         setFen(game.fen());
         setHistory(deriveHistory(game));
         setSelectedCell(undefined);
+
+        // Attribute the span since the turn began to the ply just played.
+        // Growth by more than one ply (a remote replay) can't be split, so
+        // only the newest ply carries a duration; a shrink (undo/reset)
+        // simply drops the trailing entries.
+        const now = performance.now();
+        const plyCount = game.history().length;
+        const previousCount = plyCountRef.current;
+
+        if (plyCount > previousCount) {
+            const span = now - turnStartRef.current;
+            setMoveTimes((times) => {
+                const next = times.slice(0, plyCount);
+                for (let ply = previousCount; ply < plyCount; ply++) {
+                    next[ply] = ply === plyCount - 1 ? span : 0;
+                }
+                return next;
+            });
+        } else if (plyCount < previousCount) {
+            setMoveTimes((times) => times.slice(0, plyCount));
+        }
+
+        plyCountRef.current = plyCount;
+        turnStartRef.current = now;
+        setTurnStartedAt(now);
     }, [game]);
 
     const selectCell = useCallback(
@@ -404,6 +441,8 @@ export const ChessStateProvider: React.FC<
                 fen,
                 history,
                 lastMove,
+                moveTimes,
+                turnStartedAt,
                 selectCell,
                 moveTo,
                 promote,

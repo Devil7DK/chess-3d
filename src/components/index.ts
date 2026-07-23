@@ -3,6 +3,7 @@ export * from './Board';
 export * from './Board2D';
 export * from './BoardGrid';
 export * from './BoardPreview';
+export * from './GameClock';
 export * from './GameControls';
 export * from './GameInfo';
 export * from './MainMenu';

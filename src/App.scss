@@ -25,6 +25,7 @@ div#root {
     // the canvas so the camera can't move them
     div.status-banner-wrapper,
     div.game-info-wrapper,
+    div.game-clock-wrapper,
     div.game-controls-wrapper,
     div.settings-wrapper,
     div.promotion-picker-wrapper,
@@ -308,6 +309,96 @@ div#root {
         }
     }
 
+    div.game-clock-wrapper {
+        div.game-clock {
+            // Bottom-right: the one free corner (controls top-right, moves
+            // bottom-left, settings top-left)
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+
+            min-width: 9.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: sans-serif;
+
+            div.game-clock-session {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5rem;
+
+                padding-bottom: 0.35rem;
+                margin-bottom: 0.2rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+                font-size: 0.75rem;
+                opacity: 0.8;
+            }
+
+            div.game-clock-side {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                padding: 0.25rem 0.35rem;
+                border-radius: 0.35rem;
+
+                font-size: 0.85rem;
+
+                span.side-dot {
+                    width: 0.7rem;
+                    height: 0.7rem;
+                    flex-shrink: 0;
+                    border-radius: 50%;
+                    border: 1px solid rgba(255, 255, 255, 0.6);
+
+                    &.white {
+                        background-color: #f2e3cd;
+                    }
+
+                    &.black {
+                        background-color: #241a12;
+                    }
+                }
+
+                span.clock-label {
+                    text-transform: capitalize;
+                }
+
+                span.clock-move {
+                    // Live timer for the move in progress; sits between the
+                    // label and the total, dimmed so the total stays primary
+                    margin-left: auto;
+                    font-size: 0.7rem;
+                    opacity: 0.65;
+                }
+
+                span.clock-time {
+                    margin-left: auto;
+                    font-family: monospace;
+                    font-size: 1rem;
+                    font-variant-numeric: tabular-nums;
+                }
+
+                span.clock-move + span.clock-time {
+                    margin-left: 0.5rem;
+                }
+
+                &.active {
+                    background-color: rgba(77, 163, 255, 0.25);
+                }
+            }
+        }
+    }
+
     div.move-history-wrapper {
         // Bottom-left keeps clear of the top control cluster, which the
         // portrait layout already crowds
@@ -474,6 +565,16 @@ div#root {
                             display: flex;
                             align-items: center;
                             gap: 0.25rem;
+                        }
+
+                        span.move-time {
+                            // Pushed to the right edge, dimmed so the move
+                            // stays the thing the eye reads first
+                            margin-left: auto;
+                            padding-left: 0.4rem;
+
+                            font-size: 0.7rem;
+                            opacity: 0.55;
                         }
 
                         svg.piece-icon {
