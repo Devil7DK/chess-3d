@@ -55,7 +55,7 @@ export const Piece: React.FC<IPieceProps> = ({
 
     const { geometry, material } = useMemo(() => {
         return {
-            // Shared across every piece of this type — only the material is
+            // Shared across every piece of this type. Only the material is
             // per-instance, since each side gets its own wood map
             geometry: getBakedGeometry(gltf.nodes.mesh01),
             material: gltf.materials.material01.clone(),

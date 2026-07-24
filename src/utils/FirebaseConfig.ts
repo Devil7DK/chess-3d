@@ -2,7 +2,7 @@ import type { FirebaseOptions } from 'firebase/app';
 
 // Deliberately SDK-free (the firebase import above is type-only) so UI code
 // can check isFirebaseConfigured without pulling the SDK into the main
-// bundle — see the note in ./index.ts.
+// bundle. See the note in ./index.ts.
 export const firebaseConfig: FirebaseOptions = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,

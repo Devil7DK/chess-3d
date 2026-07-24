@@ -4,7 +4,7 @@ import { useChessState } from '../../utils/ChessStateContext';
 import { playSound, SoundName } from '../../utils/sounds';
 
 /**
- * Plays a cue for each change in the game — headless, renders nothing.
+ * Plays a cue for each change in the game. Headless, renders nothing.
  * Watching `history` length and `status` (both derived from the same move)
  * covers every mode: local, AI, and remote moves all flow through the same
  * chess state, so opponent moves are heard too.
@@ -39,7 +39,7 @@ export const GameSounds = () => {
 
             void playSound(sound);
         } else if (grewBy < 0 && history.length === 0) {
-            // Reset to the opening position — undo mid-game stays silent
+            // Reset to the opening position. Undo mid-game stays silent
             void playSound('game-start');
         }
     }, [history, status]);

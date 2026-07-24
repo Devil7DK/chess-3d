@@ -23,7 +23,7 @@ export interface IBoardPreviewProps {
 }
 
 /**
- * Read-only board for a position that is not the live game — used by the
+ * Read-only board for a position that is not the live game, used by the
  * move history to replay earlier positions.
  */
 export const BoardPreview = ({
@@ -32,7 +32,7 @@ export const BoardPreview = ({
     lastMove,
 }: IBoardPreviewProps) => {
     const squares = useMemo<IBoardSquare[]>(() => {
-        // chess.js returns ranks 8→1, the same mapping deriveCells uses
+        // chess.js returns ranks 8 to 1, the same mapping deriveCells uses
         const board = new Chess(fen).board();
 
         return Array.from({ length: 64 }, (_, index) => {

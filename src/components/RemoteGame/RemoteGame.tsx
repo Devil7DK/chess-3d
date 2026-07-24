@@ -28,7 +28,7 @@ const RemoteGameRoom = ({ roomId }: { roomId: string }) => {
                         message:
                             result.error === 'full'
                                 ? 'This room already has two players.'
-                                : 'Room not found — check the code.',
+                                : 'Room not found. Check the code.',
                     });
                 } else {
                     setState({ status: 'ready', side: result.side });
@@ -56,7 +56,7 @@ const RemoteGameRoom = ({ roomId }: { roomId: string }) => {
     return (
         <div className='remote-join'>
             {state.status === 'joining' ? (
-                <span>Joining room {roomId}…</span>
+                <span>Joining room {roomId}...</span>
             ) : (
                 <>
                     <span>{state.message}</span>
@@ -68,7 +68,7 @@ const RemoteGameRoom = ({ roomId }: { roomId: string }) => {
 };
 
 /**
- * Route wrapper for `/game/:roomId` — joins (or rejoins) the room, then
+ * Route wrapper for `/game/:roomId`. Joins (or rejoins) the room, then
  * renders the scene locked to the joined side. Keyed by room id so
  * navigating to another room resets the join state.
  */

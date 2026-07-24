@@ -17,7 +17,7 @@ export interface IGameInfoProps {
 }
 
 /**
- * Names the mode and the side being played — otherwise the only clue is
+ * Names the mode and the side being played. Otherwise the only clue is
  * which end of the board the camera sits behind.
  */
 export const GameInfo = ({ ai, remote, playerSide }: IGameInfoProps) => {

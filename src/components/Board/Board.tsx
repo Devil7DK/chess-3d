@@ -14,7 +14,7 @@ import { Box, IBoxProps } from '../Shapes';
 
 /** Destination that takes a piece, as opposed to a quiet move (white). */
 const CAPTURE_COLOR = '#e2662c';
-/** The move just played — only drawn while nothing is selected. */
+/** The move just played, only drawn while nothing is selected. */
 const LAST_MOVE_COLOR = '#4da3ff';
 
 export interface IBoardProps {

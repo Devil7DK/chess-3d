@@ -17,7 +17,7 @@ export interface IBoardGridProps {
     squares: IBoardSquare[];
     /** Side whose end of the board faces the viewer. */
     playerSide: Side;
-    /** Extra class names per cell index — selection, moves, check… */
+    /** Extra class names per cell index: selection, moves, check... */
     highlights?: Map<number, string>;
     showLabels?: boolean;
     className?: string;
@@ -29,7 +29,7 @@ const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 /**
  * The flat board itself, with no opinion about where the position came
- * from — the live game renders one of these, the move history renders
+ * from: the live game renders one of these, the move history renders
  * another for a past position.
  */
 export const BoardGrid = ({
@@ -40,7 +40,7 @@ export const BoardGrid = ({
     className = '',
     onSelect,
 }: IBoardGridProps) => {
-    // Drawn top row first: white reads ranks 8→1 with files a→h, black
+    // Drawn top row first: white reads ranks 8 to 1 with files a to h, black
     // sees the board rotated a half turn
     const order = useMemo(() => {
         const indices: number[] = [];

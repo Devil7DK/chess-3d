@@ -39,8 +39,8 @@ const SceneCanvas: React.FC<{
     environment: EnvironmentPreset;
     playerSide: Side;
 }> = ({ environment, playerSide }) => {
-    // The Canvas hosts a separate React root, which context does not cross —
-    // capture the chess state here and re-provide it inside for the Board
+    // The Canvas hosts a separate React root, which context does not cross,
+    // so capture the chess state here and re-provide it inside for the Board
     const chessState = useChessState();
 
     return (
@@ -66,7 +66,7 @@ const SceneCanvas: React.FC<{
                 }}
             >
                 <color attach='background' args={['#8b6b55']} />
-                {/* Outside Stage, in its own Suspense boundary — a hanging
+                {/* Outside Stage, in its own Suspense boundary, since a hanging
                     HDR fetch must never hold up the board */}
                 <SceneEnvironment preset={environment} />
                 <Stage adjustCamera={false} environment={null} intensity={0.6}>
@@ -97,7 +97,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
         (localStorage.getItem('boardMode') as BoardMode) || '3d',
     );
 
-    // Side played on this device — the camera starts behind it and the
+    // Side played on this device. The camera starts behind it and the
     // other side is locked from being moved by clicks
     const playerSide = useMemo(
         () =>
@@ -130,7 +130,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
             }
         >
             {/* The two boards are interchangeable views of the same
-                ChessState — only one is mounted at a time */}
+                ChessState; only one is mounted at a time */}
             {boardMode === '3d' ? (
                 <SceneCanvas
                     environment={environment}

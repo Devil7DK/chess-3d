@@ -12,7 +12,7 @@ export interface IGameControlsProps {
     showUndo?: boolean;
     showNewGame?: boolean;
     /**
-     * Set in remote games — offers resigning the shared room instead.
+     * Set in remote games. Offers resigning the shared room instead.
      */
     remote?: { roomId: string; side: Side };
 }
@@ -27,8 +27,8 @@ export const GameControls = ({
     const [confirming, setConfirming] = useState(false);
     const [resigned, setResigned] = useState(false);
 
-    // Either player resigning ends the game, and chess.js cannot tell —
-    // watch the room so the button goes away for both of them. RTDB folds
+    // Either player resigning ends the game, and chess.js cannot tell.
+    // Watch the room so the button goes away for both of them. RTDB folds
     // this into RemotePlayer's subscription on the same path.
     const roomId = remote?.roomId;
     useEffect(() => {

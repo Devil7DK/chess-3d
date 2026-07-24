@@ -7,7 +7,7 @@ import { PieceIcon } from '../PieceIcon';
 
 export interface IBoard2DProps {
     /**
-     * Side played on this device — it gets the near edge of the board, the
+     * Side played on this device. It gets the near edge of the board, the
      * same way the 3D camera sits behind it.
      */
     playerSide: Side;
@@ -15,7 +15,7 @@ export interface IBoard2DProps {
 
 /**
  * Flat board over the same `ChessState` as the 3D one: identical click
- * semantics (select own piece, then move) and the same highlight meanings —
+ * semantics (select own piece, then move) and the same highlight meanings:
  * white for a move, orange for a capture, red for check, blue for the last
  * move played.
  */

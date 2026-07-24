@@ -1,5 +1,5 @@
 // Web Audio playback for game cues. Files live in src/assets/sounds and are
-// collected at build time — a missing file just means that cue stays silent,
+// collected at build time. A missing file just means that cue stays silent,
 // so the app never breaks on an absent asset and the set can grow by drop-in.
 const files = import.meta.glob('../assets/sounds/*.{mp3,ogg,wav}', {
     eager: true,
@@ -37,7 +37,7 @@ export const setSoundMuted = (value: boolean) => {
 };
 
 // One shared context, created lazily. The autoplay policy starts it
-// suspended until a user gesture — every play() here is reached from a click
+// suspended until a user gesture. Every play() here is reached from a click
 // or the resulting state change, so the resume lands inside that gesture.
 let context: AudioContext | undefined;
 

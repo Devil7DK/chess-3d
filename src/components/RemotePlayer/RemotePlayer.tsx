@@ -81,7 +81,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
         knownRoundRef.current = round;
     }, [round]);
 
-    // Both players have offered the next round — either may advance it, and
+    // Both players have offered the next round. Either may advance it, and
     // the rules reject whoever loses the race
     useEffect(() => {
         if (!service || !room || room.status !== 'playing') return;
@@ -99,7 +99,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
     }, [service, room, roomId]);
 
     // Apply moves the room record has that the local game doesn't (one per
-    // pass — applying updates history, which re-runs the effect for the
+    // pass: applying updates history, which re-runs the effect for the
     // next one, so a rejoin catches up move by move)
     useEffect(() => {
         if (!service || !room) return;
@@ -137,13 +137,13 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
     const result = resignedBy
         ? resignedBy === side
             ? 'You resigned.'
-            : 'Opponent resigned — you win!'
+            : 'Opponent resigned, you win!'
         : status === 'checkmate'
           ? playingSide === side
-              ? 'Checkmate — you lose.'
-              : 'Checkmate — you win!'
+              ? 'Checkmate, you lose.'
+              : 'Checkmate, you win!'
           : status === 'stalemate'
-            ? 'Stalemate — the game is a draw.'
+            ? 'Stalemate, the game is a draw.'
             : status === 'draw'
               ? 'The game is a draw.'
               : undefined;
@@ -186,7 +186,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
                 <div className='remote-backdrop'>
                     <div className='remote-modal'>
                         <span className='remote-modal-title'>
-                            Waiting for opponent…
+                            Waiting for opponent...
                         </span>
                         <span>Share this room code:</span>
                         <span className='remote-room-code'>{roomId}</span>
@@ -211,7 +211,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
                         <div className='remote-modal-actions'>
                             {iOffered ? (
                                 <span className='remote-modal-pending'>
-                                    Waiting for opponent…
+                                    Waiting for opponent...
                                 </span>
                             ) : (
                                 <button type='button' onClick={offerRematch}>
@@ -246,7 +246,7 @@ export const RemotePlayer = ({ roomId, side }: IRemotePlayerProps) => {
                     </button>
                 </div>
             )}
-            {/* `!result` — leaving after the game ended is not a
+            {/* `!result`: leaving after the game ended is not a
                 disconnect worth warning about */}
             {room?.status === 'playing' && !result && !opponentConnected && (
                 <div className='remote-notice'>Opponent disconnected</div>

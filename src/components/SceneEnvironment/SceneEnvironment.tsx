@@ -9,7 +9,7 @@ interface IBoundaryState {
 }
 
 /**
- * Keeps a broken environment from taking the scene with it — a failure while
+ * Keeps a broken environment from taking the scene with it. A failure while
  * decoding the HDRI throws during render, and without this the whole canvas
  * would unmount.
  */
@@ -43,8 +43,8 @@ export interface ISceneEnvironmentProps {
  * Image-based lighting, isolated behind its own Suspense boundary.
  *
  * The HDRI is bundled (see `src/assets/hdri`) instead of coming from drei's
- * CDN, but it is still a separate file fetched on demand — anything sharing a
- * Suspense boundary with it would not render until it lands. Inside `<Stage>`
+ * CDN, but it is still a separate file fetched on demand, and anything sharing
+ * a Suspense boundary with it would not render until it lands. Inside `<Stage>`
  * that meant an empty canvas with no error and no spinner. Here the board
  * draws immediately and the lighting only improves once it arrives.
  */

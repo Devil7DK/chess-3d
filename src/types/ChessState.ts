@@ -28,7 +28,7 @@ export type ChessState = {
     moveTimes: number[];
     /**
      * `performance.now()` timestamp of when the side to move started their
-     * turn — consumers derive the running side's live time from it.
+     * turn. Consumers derive the running side's live time from it.
      */
     turnStartedAt: number;
 

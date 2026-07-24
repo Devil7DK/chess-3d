@@ -66,7 +66,7 @@ function deriveCells(game: Chess): Tuple<CellState, 64> {
         const entry = board[8 - row][column - 1];
 
         // Several moves can share a destination (a promotion offers one per
-        // piece type), so collapse them — capturing if any of them captures
+        // piece type), so collapse them, capturing if any of them captures
         const possibleMoves = entry
             ? [
                   ...game
@@ -258,7 +258,7 @@ export const ChessStateProvider: React.FC<
 
     // Wall-clock timing. Every ply's think time is recorded as it happens;
     // the running side's live time is derived from turnStartedAt by consumers.
-    // Purely observational — no time control, so it never affects the game.
+    // Purely observational: no time control, so it never affects the game.
     const [moveTimes, setMoveTimes] = useState<number[]>([]);
     const [turnStartedAt, setTurnStartedAt] = useState(() =>
         performance.now(),

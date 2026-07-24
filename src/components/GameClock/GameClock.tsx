@@ -26,7 +26,7 @@ export const GameClock = () => {
         return () => clearInterval(id);
     }, [running]);
 
-    // now can trail turnStartedAt by a tick right after a move — clamp so the
+    // now can trail turnStartedAt by a tick right after a move. Clamp so the
     // live segment never reads negative
     const live =
         running && now > turnStartedAt ? now - turnStartedAt : 0;

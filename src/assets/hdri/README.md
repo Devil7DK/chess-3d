@@ -3,13 +3,13 @@
 Image-based lighting for the 3D scene, one file per environment preset,
 collected by `src/utils/environments.ts` and passed to drei's `Environment`.
 
-Only the selected preset is ever downloaded — the rest stay as separate files
+Only the selected preset is ever downloaded. The rest stay as separate files
 the browser never asks for. Adding or removing one here changes what the
 Settings panel offers, so keep `EnvironmentPreset` in `src/types` in step.
 
 ## Source & license
 
-[Poly Haven](https://polyhaven.com/hdris) HDRIs, resized to 512×512 and
+[Poly Haven](https://polyhaven.com/hdris) HDRIs, resized to 512x512 and
 converted to DWAB-compressed EXR by
 [@pmndrs/assets](https://github.com/pmndrs/assets), all CC0-1.0.
 

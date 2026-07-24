@@ -6,7 +6,7 @@ Piece & highlight meshes, loaded by `useGLTF` in `src/components/Piece` and
 ## Compression
 
 The exported meshes were ~18 MB of base64-embedded `.gltf`. They are stored
-here already welded, simplified and Meshopt-compressed — 400 kB in total, with
+here already welded, simplified and Meshopt-compressed, 400 kB in total, with
 the decoder bundled by three-stdlib rather than fetched from a CDN.
 
 To redo it for a new export, per model, with
@@ -19,7 +19,7 @@ npx @gltf-transform/cli meshopt simplified.glb <output>.glb
 ```
 
 `--error` caps how far a simplified surface may drift from the original, so it,
-not `--ratio`, is what protects the shape — the flatter models stop well short
+not `--ratio`, is what protects the shape. The flatter models stop well short
 of the requested ratio.
 
 Meshopt quantizes positions, which leaves the dequantization transform on the

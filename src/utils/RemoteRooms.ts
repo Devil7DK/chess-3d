@@ -31,24 +31,24 @@ export interface RoomState {
     players: Partial<Record<Side, string>>;
     /**
      * Moves since the start position in long algebraic notation
-     * (e.g. `e2e4`, `e7e8q`) — the authoritative game record. Stored as an
+     * (e.g. `e2e4`, `e7e8q`), the authoritative game record. Stored as an
      * append-only push-list and flattened here in key order.
      */
     moves: string[];
     fen: string;
     presence?: Record<string, boolean>;
     /**
-     * Set when a player gave up — the game is over even though the
+     * Set when a player gave up. The game is over even though the
      * position itself is still playable.
      */
     resignedBy?: Side;
     /**
      * Games played in this room so far. Move entries are immutable, so a
-     * rematch cannot clear them — each round gets its own subtree instead.
+     * rematch cannot clear them. Each round gets its own subtree instead.
      */
     round: number;
     /**
-     * `uid → the round that player has offered to play`. Once both point at
+     * `uid -> the round that player has offered to play`. Once both point at
      * the next round, either client may advance `round`.
      */
     rematch: Record<string, number>;
@@ -86,7 +86,7 @@ const promotionSymbolMap: Partial<Record<ChessPiece, string>> = {
 export const moveToUci = (move: Omit<MoveRecord, 'san'>): string =>
     `${move.from}${move.to}${move.promotion ? promotionSymbolMap[move.promotion] : ''}`;
 
-// The room record stores long algebraic moves, which carry no SAN — the
+// The room record stores long algebraic moves, which carry no SAN. The
 // caller only needs the squares to replay the move through chess.js
 export const uciToMove = (uci: string): Omit<MoveRecord, 'san'> => ({
     from: uci.slice(0, 2) as Square,
@@ -118,7 +118,7 @@ export const sweepStaleRooms = async (): Promise<number> => {
     const deletions: Promise<unknown>[] = [];
 
     stale.forEach((room) => {
-        // Someone is still connected — leave it to their disconnect
+        // Someone is still connected. Leave it to their disconnect
         if (room.hasChild('presence')) return;
 
         deletions.push(remove(room.ref).catch(() => undefined));
@@ -146,7 +146,7 @@ export const createRoom = async (
                 : 'black'
             : preferredSide;
 
-    // Retry on the (unlikely) code collision — the transaction aborts when
+    // Retry on the (unlikely) code collision. The transaction aborts when
     // the room already exists
     for (let attempt = 0; attempt < 5; attempt++) {
         const roomId = generateRoomCode();
@@ -202,7 +202,7 @@ export const joinRoom = async (roomId: string): Promise<JoinRoomResult> => {
 
         // The transaction claims just the one seat. Aborting a whole-room
         // transaction on null would trip over the SDK's empty local cache,
-        // but the null → uid direction here is safe: an optimistic claim of
+        // but the null -> uid direction here is safe: an optimistic claim of
         // a taken seat is re-run with the server value and aborts.
         const result = await runTransaction(
             ref(database, `rooms/${roomId}/players/${openSide}`),
@@ -259,7 +259,7 @@ export const findRandomMatch = async (): Promise<{ roomId: string }> => {
         }
 
         if (waiting) {
-            // Take the waiting player's open seat — the seat transaction
+            // Take the waiting player's open seat. The seat transaction
             // inside joinRoom is the arbiter if several players race for it
             const result = await joinRoom(waiting.roomId);
 
@@ -268,13 +268,13 @@ export const findRandomMatch = async (): Promise<{ roomId: string }> => {
                 return { roomId: waiting.roomId };
             }
 
-            // Room gone or already full — clear the stale entry and retry
+            // Room gone or already full. Clear the stale entry and retry
             await remove(waitingRef);
             continue;
         }
 
         // No one waiting: create a room and claim the queue slot. The
-        // null → entry transaction direction is safe against the SDK's
+        // null -> entry transaction direction is safe against the SDK's
         // empty local cache (see joinRoom).
         const { roomId } = await createRoom('random');
 
@@ -285,7 +285,7 @@ export const findRandomMatch = async (): Promise<{ roomId: string }> => {
         );
 
         if (!claim.committed) {
-            // Someone entered the queue first — drop our unused room and
+            // Someone entered the queue first. Drop our unused room and
             // match with them on the next pass
             await remove(ref(database, `rooms/${roomId}`));
             continue;
@@ -336,7 +336,7 @@ export const subscribeToRoom = (
         const round: number = snapshot.child('round').val() ?? 1;
 
         // Push keys sort chronologically, and forEach walks children in key
-        // order — so this is the move list in the order they were played
+        // order, so this is the move list in the order they were played
         const moves: string[] = [];
         snapshot.child(`moves/${round}`).forEach((entry) => {
             moves.push(entry.child('uci').val());
@@ -358,7 +358,7 @@ export const subscribeToRoom = (
 /**
  * Appends a single move. Entries are write-once and tagged with the side
  * that played them, so neither player can rewrite the record or slip in a
- * move on the other's behalf — the rules reject both.
+ * move on the other's behalf. The rules reject both.
  */
 export const pushMove = (
     roomId: string,
@@ -378,13 +378,13 @@ export const pushMove = (
     });
 };
 
-/** The uid this device plays as — the key rematch offers are stored under. */
+/** The uid this device plays as, the key rematch offers are stored under. */
 export const getCurrentUid = (): string | undefined =>
     getFirebaseAuth().currentUser?.uid;
 
 /**
  * Offers to play another game. When both players have offered the same
- * round, either client may advance `round` — the rules only accept a `+1`,
+ * round, either client may advance `round`. The rules only accept a `+1`,
  * so whoever loses the race is simply rejected.
  */
 export const offerRematch = (roomId: string, round: number) => {

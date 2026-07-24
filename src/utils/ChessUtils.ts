@@ -77,7 +77,7 @@ export function squareToIndex(square: Square): number {
 
 // #region Time
 /**
- * Formats a millisecond duration as a clock reading — `m:ss`, growing to
+ * Formats a millisecond duration as a clock reading: `m:ss`, growing to
  * `h:mm:ss` past an hour.
  */
 export function formatDuration(ms: number): string {

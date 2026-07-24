@@ -133,7 +133,7 @@ export const MainMenu = () => {
                             disabled={creatingRoom}
                             onClick={createRoom}
                         >
-                            {creatingRoom ? 'Creating room…' : 'Create Room'}
+                            {creatingRoom ? 'Creating room...' : 'Create Room'}
                         </button>
                         <div className='mode-options-divider'>or</div>
                         <label>
@@ -162,7 +162,7 @@ export const MainMenu = () => {
                             onClick={findRandomOpponent}
                         >
                             {findingMatch
-                                ? 'Finding match…'
+                                ? 'Finding match...'
                                 : 'Random Opponent'}
                         </button>
                         {remoteError && (

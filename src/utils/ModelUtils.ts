@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry, Mesh } from 'three';
 
-// Geometry already carrying its node transform — useGLTF caches one glTF per
+// Geometry already carrying its node transform. useGLTF caches one glTF per
 // file, so every component instance sees the same objects and must bake once.
 const baked = new WeakSet<BufferGeometry>();
 

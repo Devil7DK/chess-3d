@@ -11,7 +11,7 @@ export const StatusBanner = () => {
               : status === 'draw'
                 ? 'Draw!'
                 : `${playingSide === 'white' ? 'White' : 'Black'}'s turn${
-                      status === 'check' ? ' — Check!' : ''
+                      status === 'check' ? ' - Check!' : ''
                   }`;
 
     return (

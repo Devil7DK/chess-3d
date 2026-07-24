@@ -26,7 +26,7 @@ export interface IPieceIconProps {
 }
 
 /**
- * A piece as a Font Awesome glyph — shared by the 2D board and the move
+ * A piece as a Font Awesome glyph, shared by the 2D board and the move
  * history so both read the same way. Icons are imported individually so
  * the rest of the set is tree-shaken away.
  */

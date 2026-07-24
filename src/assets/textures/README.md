@@ -5,9 +5,9 @@ Wood maps for the board squares, border and pieces, loaded by `useTexture` in
 
 ## Compression
 
-The originals were ~1 MB JPEGs at 1000–1024 px. A square is drawn around 50 px
+The originals were ~1 MB JPEGs at 1000-1024 px. A square is drawn around 50 px
 and a piece around 90 px tall at the default camera, so 512 px is still well
-oversampled — even zoomed all the way in the grain holds up.
+oversampled. Even zoomed all the way in the grain holds up.
 
 To redo it for a new source image:
 

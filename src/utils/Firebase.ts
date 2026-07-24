@@ -9,7 +9,7 @@ let app: FirebaseApp | undefined;
 const getFirebaseApp = (): FirebaseApp => {
     if (!isFirebaseConfigured) {
         throw new Error(
-            'Firebase is not configured — set the VITE_FIREBASE_* variables (see .env.example)',
+            'Firebase is not configured. Set the VITE_FIREBASE_* variables (see .env.example)',
         );
     }
 
