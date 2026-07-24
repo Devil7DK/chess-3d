@@ -4,15 +4,16 @@ import React, { useMemo, useRef } from 'react';
 import { Group, MathUtils, Mesh, MeshStandardMaterial, Vector3 } from 'three';
 import { GLTF } from 'three-stdlib';
 
-import Bishop from '../../assets/models/Bishop.gltf';
-import King from '../../assets/models/King.gltf';
-import Knight from '../../assets/models/Knight.gltf';
-import Pawn from '../../assets/models/Pawn.gltf';
-import Queen from '../../assets/models/Queen.gltf';
-import Rook from '../../assets/models/Rook.gltf';
+import Bishop from '../../assets/models/Bishop.glb';
+import King from '../../assets/models/King.glb';
+import Knight from '../../assets/models/Knight.glb';
+import Pawn from '../../assets/models/Pawn.glb';
+import Queen from '../../assets/models/Queen.glb';
+import Rook from '../../assets/models/Rook.glb';
 import WoodBlack from '../../assets/textures/wood-black.jpg';
 import WoodWhite from '../../assets/textures/wood-white.jpg';
 import { ChessPiece, Point3D, Side } from '../../types';
+import { getBakedGeometry } from '../../utils';
 
 export type IPieceProps = ThreeElements['group'] & {
     piece: ChessPiece;
@@ -54,7 +55,9 @@ export const Piece: React.FC<IPieceProps> = ({
 
     const { geometry, material } = useMemo(() => {
         return {
-            geometry: gltf.nodes.mesh01.geometry.clone(),
+            // Shared across every piece of this type — only the material is
+            // per-instance, since each side gets its own wood map
+            geometry: getBakedGeometry(gltf.nodes.mesh01),
             material: gltf.materials.material01.clone(),
         };
     }, [gltf]);

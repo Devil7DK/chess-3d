@@ -5,6 +5,7 @@ import { GLTF } from 'three-stdlib';
 
 import FrameModel from '../../assets/models/Frame.glb';
 import { Point3D } from '../../types';
+import { getBakedGeometry } from '../../utils';
 
 type GLTFResult = GLTF & {
     nodes: {
@@ -28,7 +29,7 @@ export const Frame = ({
     const { nodes } = useGLTF(FrameModel) as unknown as GLTFResult;
 
     const geometry = useMemo(() => {
-        return nodes.imagetostl_mesh0.geometry;
+        return getBakedGeometry(nodes.imagetostl_mesh0);
     }, [nodes]);
 
     return (
