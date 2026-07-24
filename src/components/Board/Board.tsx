@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 import { ColorRepresentation, Vector3 } from 'three';
 
 import { useTexture } from '@react-three/drei';
-import WoodBlack from '../../assets/textures/wood-black.jpg';
-import WoodBrown from '../../assets/textures/wood-brown.jpg';
-import WoodWhite from '../../assets/textures/wood-white.jpg';
+import WoodBlack from '../../assets/textures/wood-black.webp';
+import WoodBrown from '../../assets/textures/wood-brown.webp';
+import WoodWhite from '../../assets/textures/wood-white.webp';
 import { Point3D } from '../../types';
 import { get2DPointInGrid } from '../../utils';
 import { useChessState } from '../../utils/ChessStateContext';

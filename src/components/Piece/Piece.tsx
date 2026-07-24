@@ -10,8 +10,8 @@ import Knight from '../../assets/models/Knight.glb';
 import Pawn from '../../assets/models/Pawn.glb';
 import Queen from '../../assets/models/Queen.glb';
 import Rook from '../../assets/models/Rook.glb';
-import WoodBlack from '../../assets/textures/wood-black.jpg';
-import WoodWhite from '../../assets/textures/wood-white.jpg';
+import WoodBlack from '../../assets/textures/wood-black.webp';
+import WoodWhite from '../../assets/textures/wood-white.webp';
 import { ChessPiece, Point3D, Side } from '../../types';
 import { getBakedGeometry } from '../../utils';
 
