@@ -1,5 +1,4 @@
 import { OrbitControls, Stage } from '@react-three/drei';
-import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { Canvas } from '@react-three/fiber';
 import React, { Suspense, useMemo, useState } from 'react';
 
@@ -20,7 +19,8 @@ import {
     Settings,
     StatusBanner,
 } from './components';
-import { BoardMode, Side } from './types';
+import { BoardMode, EnvironmentPreset, Side } from './types';
+import { DEFAULT_ENVIRONMENT, isEnvironmentPreset } from './utils';
 import { ChessStateProvider } from './utils/ChessState';
 import { ChessStateContext, useChessState } from './utils/ChessStateContext';
 
@@ -36,7 +36,7 @@ export interface ISceneProps {
 }
 
 const SceneCanvas: React.FC<{
-    environment: PresetsType;
+    environment: EnvironmentPreset;
     playerSide: Side;
 }> = ({ environment, playerSide }) => {
     // The Canvas hosts a separate React root, which context does not cross —
@@ -87,9 +87,12 @@ const SceneCanvas: React.FC<{
 };
 
 export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
-    const [environment, setEnvironment] = useState<PresetsType>(
-        (localStorage.getItem('environment') as PresetsType) || 'studio',
-    );
+    const [environment, setEnvironment] = useState<EnvironmentPreset>(() => {
+        // A preset dropped from the bundle would otherwise leave the scene
+        // unlit until the setting is touched
+        const stored = localStorage.getItem('environment');
+        return isEnvironmentPreset(stored) ? stored : DEFAULT_ENVIRONMENT;
+    });
     const [boardMode, setBoardMode] = useState<BoardMode>(
         (localStorage.getItem('boardMode') as BoardMode) || '3d',
     );
@@ -106,7 +109,7 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
         [ai, remote],
     );
 
-    const setEnvironmentAndStore = (env: PresetsType) => {
+    const setEnvironmentAndStore = (env: EnvironmentPreset) => {
         setEnvironment(env);
         localStorage.setItem('environment', env);
     };

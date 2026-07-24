@@ -1,4 +1,5 @@
 export * from './ChessUtils';
+export * from './environments';
 export * from './ModelUtils';
 export * from './sounds';
 // Firebase.ts is intentionally not re-exported here: the SDK can't be

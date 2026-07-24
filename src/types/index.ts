@@ -5,6 +5,7 @@ export * from './CellPosition';
 export * from './CellState';
 export * from './ChessPiece';
 export * from './ChessState';
+export * from './EnvironmentPreset';
 export * from './GameStatus';
 export * from './MoveRecord';
 export * from './PieceState';

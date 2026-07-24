@@ -1,12 +1,12 @@
-import { PresetsType } from '@react-three/drei/helpers/environment-assets';
 import { useEffect, useRef, useState } from 'react';
 
-import { BoardMode } from '../../types';
+import { BoardMode, EnvironmentPreset } from '../../types';
+import { environmentPresets } from '../../utils';
 import { isSoundMuted, setSoundMuted } from '../../utils/sounds';
 
 export interface ISettingsProps {
-    environment: PresetsType;
-    onChangeEnvironment: (env: PresetsType) => void;
+    environment: EnvironmentPreset;
+    onChangeEnvironment: (env: EnvironmentPreset) => void;
     boardMode: BoardMode;
     onChangeBoardMode: (mode: BoardMode) => void;
 }
@@ -97,20 +97,18 @@ export const Settings = ({
                                     value={environment}
                                     onChange={(e) =>
                                         onChangeEnvironment(
-                                            e.target.value as PresetsType,
+                                            e.target.value as EnvironmentPreset,
                                         )
                                     }
                                 >
-                                    <option value='sunset'>Sunset</option>
-                                    <option value='dawn'>Dawn</option>
-                                    <option value='night'>Night</option>
-                                    <option value='warehouse'>Warehouse</option>
-                                    <option value='forest'>Forest</option>
-                                    <option value='apartment'>Apartment</option>
-                                    <option value='studio'>Studio</option>
-                                    <option value='city'>City</option>
-                                    <option value='park'>Park</option>
-                                    <option value='lobby'>Lobby</option>
+                                    {/* Driven by what is actually bundled, so
+                                        the list can never offer a missing HDRI */}
+                                    {environmentPresets.map((preset) => (
+                                        <option key={preset} value={preset}>
+                                            {preset[0].toUpperCase() +
+                                                preset.slice(1)}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         )}

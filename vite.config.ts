@@ -24,5 +24,5 @@ export default defineConfig({
             ],
         }),
     ],
-    assetsInclude: ['**/*.gltf', '**/*.glb'],
+    assetsInclude: ['**/*.gltf', '**/*.glb', '**/*.exr'],
 });
