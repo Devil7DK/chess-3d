@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { AIDifficulty, Side } from '../../types';
+import { useWakeLock } from '../../utils';
 import { isFirebaseConfigured } from '../../utils/FirebaseConfig';
 
 export const MainMenu = () => {
@@ -17,6 +18,10 @@ export const MainMenu = () => {
     const [creatingRoom, setCreatingRoom] = useState(false);
     const [findingMatch, setFindingMatch] = useState(false);
     const [remoteError, setRemoteError] = useState<string>();
+
+    // Matchmaking sits on the queue until someone else shows up, which can
+    // be a long stare at a menu. The rest of the menu is fine to dim.
+    useWakeLock(creatingRoom || findingMatch);
 
     const createRoom = async () => {
         setCreatingRoom(true);

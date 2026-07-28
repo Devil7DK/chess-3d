@@ -21,7 +21,7 @@ import {
     StatusBanner,
 } from './components';
 import { BoardMode, EnvironmentPreset, Side } from './types';
-import { DEFAULT_ENVIRONMENT, isEnvironmentPreset } from './utils';
+import { DEFAULT_ENVIRONMENT, isEnvironmentPreset, useWakeLock } from './utils';
 import { ChessStateProvider } from './utils/ChessState';
 import { ChessStateContext, useChessState } from './utils/ChessStateContext';
 
@@ -97,6 +97,9 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
     const [boardMode, setBoardMode] = useState<BoardMode>(
         (localStorage.getItem('boardMode') as BoardMode) || '3d',
     );
+
+    // Thinking, or waiting on the opponent, is time without a single tap
+    useWakeLock();
 
     // Side played on this device. The camera starts behind it and the
     // other side is locked from being moved by clicks
