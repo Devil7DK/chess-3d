@@ -26,6 +26,7 @@ div#root {
     div.status-banner-wrapper,
     div.game-info-wrapper,
     div.game-clock-wrapper,
+    div.material-score-wrapper,
     div.game-controls-wrapper,
     div.settings-wrapper,
     div.promotion-picker-wrapper,
@@ -259,6 +260,16 @@ div#root {
                     color: #2a1d13;
                 }
             }
+
+            span.board-2d-advantage {
+                margin-left: 0.35rem;
+
+                color: white;
+                font-family: monospace;
+                font-size: 0.9rem;
+                font-variant-numeric: tabular-nums;
+                opacity: 0.8;
+            }
         }
     }
 
@@ -395,6 +406,55 @@ div#root {
                 &.active {
                     background-color: rgba(77, 163, 255, 0.25);
                 }
+            }
+        }
+    }
+
+    div.material-score-wrapper {
+        div.material-score {
+            // Rides just above the clock in the bottom-right corner, so
+            // the offset has to clear the clock panel's height
+            position: absolute;
+            right: 1rem;
+            bottom: 8rem;
+
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.5rem;
+
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: sans-serif;
+            font-size: 0.85rem;
+
+            span.side-dot {
+                width: 0.7rem;
+                height: 0.7rem;
+                flex-shrink: 0;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 255, 255, 0.6);
+
+                &.white {
+                    background-color: #f2e3cd;
+                }
+
+                &.black {
+                    background-color: #241a12;
+                }
+            }
+
+            span.material-score-side {
+                text-transform: capitalize;
+            }
+
+            span.material-score-value {
+                margin-left: auto;
+                font-family: monospace;
+                font-size: 1rem;
+                font-variant-numeric: tabular-nums;
             }
         }
     }

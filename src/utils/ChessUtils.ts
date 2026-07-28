@@ -1,6 +1,6 @@
 import { Square } from 'chess.js';
 
-import { CellPosition, Point2D } from '../types';
+import { CellPosition, ChessPiece, Point2D, Side } from '../types';
 
 // #region Grid
 export function getIndexFromRowColumn(cellPosition: CellPosition): number;
@@ -74,6 +74,45 @@ export function squareToIndex(square: Square): number {
     return getIndexFromRowColumn(row, column);
 }
 // #endregion Notation
+
+// #region Material
+/**
+ * Classic piece values in pawns. The king is never captured, so it only
+ * exists here to keep the record exhaustive.
+ */
+const pieceValues: Record<ChessPiece, number> = {
+    king: 0,
+    queen: 9,
+    rook: 5,
+    bishop: 3,
+    knight: 3,
+    pawn: 1,
+};
+
+/**
+ * Material lead read off the captures, the way lichess shows it: which
+ * side is up and by how many pawns. Undefined when the captures balance
+ * out, since there is no lead worth showing then.
+ */
+export function getMaterialAdvantage(
+    capturedPieces: Record<Side, ChessPiece[]>,
+): { side: Side; value: number } | undefined {
+    const valueOf = (pieces: ChessPiece[]) =>
+        pieces.reduce((total, piece) => total + pieceValues[piece], 0);
+
+    // capturedPieces is keyed by the capturing side, so each side's own
+    // list is what it has won
+    const difference =
+        valueOf(capturedPieces.white) - valueOf(capturedPieces.black);
+
+    if (difference === 0) return undefined;
+
+    return {
+        side: difference > 0 ? 'white' : 'black',
+        value: Math.abs(difference),
+    };
+}
+// #endregion Material
 
 // #region Time
 /**

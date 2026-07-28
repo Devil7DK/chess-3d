@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { Side } from '../../types';
+import { getMaterialAdvantage } from '../../utils';
 import { useChessState } from '../../utils/ChessStateContext';
 import { BoardGrid } from '../BoardGrid';
 import { PieceIcon } from '../PieceIcon';
@@ -67,6 +68,11 @@ export const Board2D = ({ playerSide }: IBoard2DProps) => {
         return classes;
     }, [cells, selectedCell, lastMove, status, playingSide]);
 
+    const advantage = useMemo(
+        () => getMaterialAdvantage(capturedPieces),
+        [capturedPieces],
+    );
+
     const onSelect = (index: number) => {
         if (selectedCell === undefined || selectedCell === index) {
             selectCell(index);
@@ -89,6 +95,11 @@ export const Board2D = ({ playerSide }: IBoard2DProps) => {
                     side={side === 'white' ? 'black' : 'white'}
                 />
             ))}
+            {/* Only the leading side gets a number, so the sign always
+                reads as "up by this much" */}
+            {advantage?.side === side && (
+                <span className='board-2d-advantage'>+{advantage.value}</span>
+            )}
         </div>
     );
 

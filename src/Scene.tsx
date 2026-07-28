@@ -12,6 +12,7 @@ import {
     GameSounds,
     IAIPlayerProps,
     IRemotePlayerProps,
+    MaterialScore,
     MoveHistory,
     PromotionPicker,
     RemotePlayer,
@@ -144,6 +145,9 @@ export const Scene: React.FC<ISceneProps> = ({ ai, remote }) => {
             <GameSounds />
             <StatusBanner />
             <GameInfo ai={ai} remote={remote} playerSide={playerSide} />
+            {/* The 2D board carries the lead in its capture rows, so the
+                badge is only needed alongside the 3D tray */}
+            {boardMode === '3d' && <MaterialScore />}
             <GameClock />
             <PromotionPicker />
             <GameControls

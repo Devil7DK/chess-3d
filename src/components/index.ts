@@ -8,6 +8,7 @@ export * from './GameControls';
 export * from './GameInfo';
 export * from './GameSounds';
 export * from './MainMenu';
+export * from './MaterialScore';
 export * from './MoveHistory';
 export * from './Piece';
 export * from './PieceIcon';
